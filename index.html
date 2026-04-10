@@ -798,6 +798,26 @@
   .sb-autofix-btn:hover { background: #1a0808; }
   .sb-autofix-btn.visible { display: block; }
 
+  .sb-quick-actions { margin: 10px 0 14px; }
+  .sb-example-btn {
+    width: 100%; padding: 8px 12px;
+    background: transparent; border: 1px solid var(--accent2);
+    color: var(--accent2); border-radius: 5px; cursor: pointer;
+    font-size: 0.8rem; font-family: inherit;
+  }
+  .sb-example-btn:hover { background: #0a140c; }
+
+  .sb-worklist {
+    background: #0c1310; border: 1px solid var(--border);
+    border-radius: 6px; padding: 10px 14px; margin-bottom: 12px;
+  }
+  .sb-worklist strong {
+    display: block; margin-bottom: 6px;
+    font-size: 0.78rem; color: var(--accent);
+  }
+  .sb-worklist ul { margin: 0; padding-left: 18px; }
+  .sb-worklist li { margin-bottom: 4px; font-size: 0.78rem; color: var(--text); }
+
   .sb-diagram-wrap {
     background: var(--bg); border: 1px solid var(--border);
     border-radius: 6px; padding: 12px; margin-top: 16px; overflow-x: auto;
@@ -1437,12 +1457,12 @@
         <h3>S-böj — flytta röret åt sidan utan att byta riktning</h3>
         <p>Röret ska passera förbi ett hinder eller byta läge — men fortsätta i samma riktning. Du gör två böjar: en åt sidan och en tillbaka. Som bokstaven S.</p>
         <ul>
-          <li><strong>D — sidoförflyttning:</strong> Hur långt åt sidan röret ska flytta sig (cc till cc)</li>
-          <li><strong>H — axial sträcka:</strong> Det raka avståndet längs röret mellan böjpunkterna</li>
-          <li><strong>Vinkel α:</strong> Böjvinkeln — välj förval eller beräkna fritt från D och H</li>
+          <li><strong>Sidmått:</strong> Hur långt röret ska flyttas åt sidan</li>
+          <li><strong>Längd längs väggen:</strong> Avståndet från rörände till första böjmärket</li>
+          <li><strong>Böjvinkel:</strong> Välj en av knapparna (45° fungerar oftast bra)</li>
         </ul>
-        <div class="intro-tip">💡 Mät D rakt tvärs — inte längs röret. H är den axelparallella sträckan, inte diagonalen.</div>
-        <div class="intro-extra">⚙ Appen varnar om H är för kort i förhållande till D och böjradien — då kolliderar böjarna med varandra.</div>
+        <div class="intro-tip">💡 Mät sidmåttet rakt tvärs mellan rörens centrum. Mät inte längs röret.</div>
+        <div class="intro-extra">⚙ Så gör du: 1) Fyll i sidmått. 2) Fyll i längd längs väggen. 3) Klicka Beräkna och markera M1/M2 på röret.</div>
       </div>
       <div id="sb-intent" class="sb-intent"></div>
       <div class="panel-title">Indata — S-böj (parallellförskjutning)</div>
@@ -1483,20 +1503,24 @@
       <div class="section-label">Geometri</div>
       <div class="input-grid-3">
         <div class="field">
-          <label for="sb-offset">Förskjutning <span>(D)</span></label>
+          <label for="sb-offset">Sidmått</label>
           <input type="number" id="sb-offset" value="50" min="1" step="1" oninput="sbLiveUpdate()">
           <div class="hint">Parallell förskjutning [mm]</div>
         </div>
         <div class="field">
-          <label for="sb-m1">Rör före M1</label>
+          <label for="sb-m1">Längd längs väggen</label>
           <input type="number" id="sb-m1" value="100" min="0" step="1" oninput="sbLiveUpdate()">
-          <div class="hint">Röränden → böjmärke M1 [mm]</div>
+          <div class="hint">Från rörände till första böjmärket [mm]</div>
         </div>
         <div class="field">
           <label for="sb-end">Rör efter M2</label>
           <input type="number" id="sb-end" value="100" min="0" step="1" oninput="sbLiveUpdate()">
           <div class="hint">Böjmärke M2 → rörände [mm]</div>
         </div>
+      </div>
+
+      <div class="sb-quick-actions">
+        <button type="button" class="sb-example-btn" onclick="sbLoadExample()">Testa med exempelmått</button>
       </div>
 
       <button type="button" class="calc-btn" onclick="sbCalculate()">▶ BERÄKNA S-BÖJ</button>
@@ -1525,6 +1549,7 @@
       <div class="panel">
         <div class="panel-title">Böjmärken</div>
         <div class="sb-marks-grid" id="sb-marks-grid"></div>
+        <div class="sb-worklist" id="sb-worklist"></div>
         <div class="sb-diagram-wrap">
           <svg id="sbend-svg" xmlns="http://www.w3.org/2000/svg"></svg>
         </div>
@@ -3491,6 +3516,30 @@ function sbSetIntent() {
   el.classList.add('visible');
 }
 
+function sbLoadExample() {
+  sbSetPipeSize(12);
+  const angleBtn = [...document.querySelectorAll('.sb-angle-toggle .mode-btn')]
+    .find(b => b.textContent.includes('45'));
+  sbSetAngle(45, angleBtn || null);
+  document.getElementById('sb-offset').value = 60;
+  document.getElementById('sb-m1').value = 120;
+  document.getElementById('sb-end').value = 90;
+  sbSetIntent();
+}
+
+function sbUpdateWorkList(m1, m2) {
+  const el = document.getElementById('sb-worklist');
+  if (!el) return;
+  el.innerHTML = `
+    <strong>Gör så här på röret:</strong>
+    <ul>
+      <li>Sätt tumstockens nolla på röränden där du börjar mäta.</li>
+      <li>Markera första böjen vid ${m1.toFixed(1)} mm (M1).</li>
+      <li>Mät vidare och markera andra böjen vid ${m2.toFixed(1)} mm (M2).</li>
+      <li>Bocka enligt riktningen i rutorna: först vänster, sedan höger.</li>
+    </ul>`;
+}
+
 function sbToggleAutoFix(show) {
   const btn = document.getElementById('sb-autofix');
   if (!btn) return;
@@ -3605,6 +3654,8 @@ function sbCalculate() {
       <div><span class="sb-mark-val sb-mark-danger">${(bd * 2).toFixed(1)}</span> <span class="sb-mark-unit">mm</span></div>
       <div class="sb-mark-dir">Per böj: ${bd.toFixed(1)} mm</div>
     </div>`;
+
+  sbUpdateWorkList(M1, M2);
 
   sbDrawDiagram(M1, L, rB, D, H, A);
 }
