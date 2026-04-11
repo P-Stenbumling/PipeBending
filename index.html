@@ -466,6 +466,23 @@
 
   /* ══ FLERBÖJ TAB ════════════════════════════════════════════════════════ */
   #mb-section { animation: fadeIn 0.25s ease; }
+  .mb-mode-toggle { display:flex; gap:6px; margin-bottom:10px; }
+  .mbm-btn {
+    padding:5px 14px; border-radius:4px; border:1px solid var(--border);
+    background:var(--surface); color:var(--text-dim);
+    font-size:0.8rem; cursor:pointer; font-family:'Share Tech Mono', monospace;
+  }
+  .mbm-btn.active { background:var(--accent); color:#000; font-weight:bold; border-color:var(--accent); }
+  .mb-hidden { display:none !important; }
+  .mb-simple-card {
+    display:none; background:#161b18; border:1px solid var(--border);
+    border-radius:8px; padding:14px 18px; margin-bottom:12px;
+  }
+  .mb-simple-card.visible { display:block; }
+  .mbsc-row { display:flex; align-items:baseline; gap:8px; margin-bottom:6px; }
+  .mbsc-label { color:var(--text-dim); font-size:0.82rem; flex:1; }
+  .mbsc-val { font-size:1.45rem; font-weight:bold; color:var(--accent); font-family:'Share Tech Mono', monospace; }
+  .mbsc-unit { color:var(--text-dim); font-size:0.78rem; }
 
   .mb-top-grid {
     display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -1362,6 +1379,10 @@
         <div class="intro-tip">💡 Märk alltid från samma ände (START). Blanda inte referensändar på halvvägs — då stämmer inte böjpositionerna.</div>
         <div class="intro-extra">⚙ U-bockläge sätter upp ett 4-böjars omlopp direkt. Skarv med muff: appen visar märkpositioner på pjäs 1 och pjäs 2 separat utan att ändra grundmåtten.</div>
       </div>
+      <div class="mb-mode-toggle" id="mb-mode-toggle">
+        <button type="button" class="mbm-btn active" data-mbmode="simple" onclick="mbSetMode('simple')">Enkelt</button>
+        <button type="button" class="mbm-btn" data-mbmode="advanced" onclick="mbSetMode('advanced')">Avancerat</button>
+      </div>
       <div class="panel-title">Indata — Flerböj (sekventiell märkning)</div>
 
       <div class="mb-top-grid">
@@ -1385,7 +1406,7 @@
           </div>
           <input type="hidden" id="mb-angle" value="90">
         </div>
-        <div class="field">
+        <div class="field mb-advanced-only">
           <label for="mb-clr">CLR <span>(böjradie)</span></label>
           <div class="bt-group">
             <button type="button" class="bt-btn active" data-tool="fromax" onclick="mbSetBendTool('fromax')">Fromax</button>
@@ -1400,11 +1421,11 @@
       <div class="mb-deduct-badge" id="mb-deduct-badge">
         <span class="bd-label">Böjavdrag per böj:</span>
         <span class="bd-val" id="mb-bd-auto">19 mm</span>
-        <span class="bd-label" id="mb-bd-src">(empiriskt — Fromax 90°)</span>
-        <span class="bd-label mb-deduct-gap">Override:</span>
-        <input type="number" class="mb-deduct-override" id="mb-bd-override" placeholder="auto" min="0" step="0.5"
+        <span class="bd-label mb-advanced-only" id="mb-bd-src">(empiriskt — Fromax 90°)</span>
+        <span class="bd-label mb-deduct-gap mb-advanced-only">Override:</span>
+        <input type="number" class="mb-deduct-override mb-advanced-only" id="mb-bd-override" placeholder="auto" min="0" step="0.5"
                title="Lämna tom för auto-beräkning" oninput="mbRecalc()">
-        <span class="bd-label">mm</span>
+        <span class="bd-label mb-advanced-only">mm</span>
       </div>
 
       <!-- Segments -->
@@ -1421,8 +1442,8 @@
       </div>
 
       <!-- Stock length -->
-      <div class="section-label">Stocklängd <span class="section-label-accent">(valfritt)</span></div>
-      <div class="input-grid-2">
+      <div class="section-label mb-advanced-only">Stocklängd <span class="section-label-accent">(valfritt)</span></div>
+      <div class="input-grid-2 mb-advanced-only">
         <div class="field">
           <label for="mb-stock">Stocklängd</label>
           <input type="number" id="mb-stock" value="3000" min="100" step="50">
@@ -1435,6 +1456,13 @@
 
     <!-- RESULTS -->
     <div id="mb-results">
+
+      <div id="mb-simple-card" class="mb-simple-card mb-simple-only">
+        <div class="mbsc-row"><span class="mbsc-label">Kapa röret till</span><span class="mbsc-val" id="mbsc-total">—</span><span class="mbsc-unit">mm</span></div>
+        <div class="mbsc-row"><span class="mbsc-label">Antal böjar</span><span class="mbsc-val" id="mbsc-bends">—</span><span class="mbsc-unit">st</span></div>
+        <div class="mbsc-row"><span class="mbsc-label">Första märke från START</span><span class="mbsc-val" id="mbsc-first">—</span><span class="mbsc-unit">mm</span></div>
+        <div id="mbsc-note" class="hint"></div>
+      </div>
 
       <!-- Hero: total length -->
       <div class="mb-result-hero">
@@ -1514,15 +1542,15 @@
           <svg id="mb-diagram" xmlns="http://www.w3.org/2000/svg"></svg>
         </div>
 
-        <div class="section-label mb-diagram-label">Riktningsvy — böjmönster uppifrån</div>
-        <div class="mb-diagram-wrap">
+        <div class="section-label mb-diagram-label mb-advanced-only">Riktningsvy — böjmönster uppifrån</div>
+        <div class="mb-diagram-wrap mb-advanced-only">
           <svg id="mb-iso-diagram" xmlns="http://www.w3.org/2000/svg"></svg>
         </div>
 
-        <div class="note mb-note-gap">
+        <div class="note mb-note-gap mb-advanced-only">
           Varje böj förkortar effektiv längd med böjavdraget. Märkena kompenseras kumulativt — märk från <em>samma</em> ändpunkt på röret.
         </div>
-        <div class="mb-clr-note">
+        <div class="mb-clr-note mb-advanced-only">
           <strong>När används CLR-formeln?</strong>
           <ul>
             <li>Icke-90° böjar (45°, 30° etc.) — inget empiriskt värde finns</li>
@@ -2485,6 +2513,41 @@ function setTrPerspPreset(preset) {
 // Default segments (spec example)
 let mbSegments = [1420, 1312, 405, 300];
 let mbDirs     = ['L', 'R', 'R'];  // length = mbSegments.length - 1
+let mbMode = 'simple';
+
+function mbSetMode(mode) {
+  mbMode = mode;
+  sessionStorage.setItem('mb_ui_mode', mode);
+  document.querySelectorAll('#mb-section .mb-advanced-only').forEach(el =>
+    el.classList.toggle('mb-hidden', mode === 'simple'));
+  document.querySelectorAll('#mb-section .mb-simple-only').forEach(el =>
+    el.classList.toggle('mb-hidden', mode === 'advanced'));
+  document.querySelectorAll('.mbm-btn').forEach(btn =>
+    btn.classList.toggle('active', btn.dataset.mbmode === mode));
+
+  const simpleCard = document.getElementById('mb-simple-card');
+  const resultsVisible = document.getElementById('mb-results')?.style.display === 'block';
+  if (simpleCard) {
+    if (mode === 'simple' && resultsVisible) {
+      document.getElementById('mbsc-total').textContent = document.getElementById('mb-total-val')?.textContent || '—';
+      document.getElementById('mbsc-bends').textContent = document.getElementById('mb-bend-count')?.textContent || '—';
+      const firstMark = document.querySelector('#mb-marks-tbody tr:not(.mb-total-row) .mb-mark-pos');
+      document.getElementById('mbsc-first').textContent = firstMark ? firstMark.textContent.replace(/\s*mm\s*$/, '') : '—';
+      const note = document.getElementById('mbsc-note');
+      if (note) {
+        if (!sessionStorage.getItem('mb_simple_tip')) {
+          note.textContent = 'Tips: märk alla positioner från samma START-ände innan du börjar bocka';
+        } else {
+          const badge = document.getElementById('mb-bd-auto');
+          note.textContent = badge ? `Böjavdrag per böj: ${badge.textContent}` : '';
+        }
+      }
+      simpleCard.classList.add('visible');
+    } else {
+      simpleCard.classList.remove('visible');
+    }
+  }
+}
 
 function mbGetCLR() {
   return parseFloat(document.getElementById('mb-clr').value) || 43;
@@ -2685,6 +2748,27 @@ function mbCalculate() {
   document.getElementById('mb-total-val').textContent    = Math.round(total);
   document.getElementById('mb-bend-count').textContent   = nBends;
   document.getElementById('mb-total-deduct').textContent = Math.round(totalDeduct);
+
+  const mbSimpleCard = document.getElementById('mb-simple-card');
+  if (mbSimpleCard) {
+    if (mbMode === 'simple') {
+      document.getElementById('mbsc-total').textContent = Math.round(total);
+      document.getElementById('mbsc-bends').textContent = nBends;
+      document.getElementById('mbsc-first').textContent = marks.length ? Math.round(marks[0]) : '—';
+      const note = document.getElementById('mbsc-note');
+      if (note) {
+        if (!sessionStorage.getItem('mb_simple_tip')) {
+          note.textContent = 'Tips: märk alla positioner från samma START-ände innan du börjar bocka';
+          sessionStorage.setItem('mb_simple_tip', '1');
+        } else {
+          note.textContent = `Böjavdrag per böj: ${Math.round(bd)} mm`;
+        }
+      }
+      mbSimpleCard.classList.add('visible');
+    } else {
+      mbSimpleCard.classList.remove('visible');
+    }
+  }
 
   // v0.5.5 — clamp checks (lead-in priority, identical to S-böj reference)
   const firstSegHintEl = document.getElementById('mb-first-seg-hint');
@@ -5866,6 +5950,8 @@ window.onload = () => {
   // Init multi-bend tab
   mbUpdateDeductBadge();
   mbRenderSegments();
+  const savedMbMode = sessionStorage.getItem('mb_ui_mode') || 'simple';
+  mbSetMode(savedMbMode);
   toCheckFieldWarnings();
   trCheckFieldWarnings();
 
