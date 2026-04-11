@@ -126,6 +126,25 @@
     letter-spacing: 0.1em; cursor: pointer; text-transform: uppercase; transition: all 0.15s;
   }
   .mode-btn.active { background: var(--surface); color: var(--accent); border-color: var(--border); }
+  .banana-mode-toggle { display:flex; gap:6px; margin-bottom:10px; }
+  .bm-btn {
+    padding:5px 14px; border-radius:4px; border:1px solid var(--border);
+    background:var(--surface); color:var(--text-dim);
+    font-size:0.8rem; cursor:pointer; font-family:'Share Tech Mono', monospace;
+  }
+  .bm-btn.active { background:var(--accent); color:#000; font-weight:bold; border-color:var(--accent); }
+  .banana-simple-card {
+    display:none; background:#161b18; border:1px solid var(--border);
+    border-radius:8px; padding:14px 18px; margin-bottom:12px;
+  }
+  .banana-simple-card.visible { display:block; }
+  .bsc-row { display:flex; align-items:baseline; gap:8px; margin-bottom:6px; }
+  .bsc-label { color:var(--text-dim); font-size:0.82rem; flex:1; }
+  .bsc-val { font-size:1.5rem; font-weight:bold; color:var(--accent); font-family:'Share Tech Mono', monospace; }
+  .bsc-unit { color:var(--text-dim); font-size:0.78rem; }
+  .bsc-angle .bsc-val { font-size:1.1rem; color:var(--text); }
+  .banana-hidden { display:none !important; }
+  .banana-instick-legend { margin-top: 8px; }
 
   /* ── ANGLE PRESETS ── */
   .preset-row {
@@ -986,7 +1005,7 @@
       </svg>
     </div>
     <div>
-      <h1>RÖRBOCK <span>// PIPE BENDING CALCULATOR v0.5.5</span></h1>
+      <h1>RÖRBOCK <span>// PIPE BENDING CALCULATOR v0.5.6</span></h1>
     </div>
     <a href="https://buymeacoffee.com/pstenbumling" target="_blank" rel="noopener" class="bmc-btn">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.216 6.415l-.132-.666c-.119-.598-.388-1.163-1.001-1.379-.197-.069-.42-.098-.57-.241-.152-.143-.196-.366-.231-.572-.065-.378-.125-.756-.192-1.133-.057-.325-.102-.69-.25-.987-.195-.4-.597-.634-.996-.788a5.723 5.723 0 00-.626-.194c-1-.263-2.05-.36-3.077-.416a25.834 25.834 0 00-3.7.062c-.915.083-1.88.184-2.75.5-.318.116-.646.256-.919.479-.259.211-.514.643-.438 1.033.074.39.446.561.719.755.336.232.437.63.437 1.021V6.069c0 .557-.157 1.108-.183 1.666-.02.437.073.874.157 1.303l.208 1.068c.18.92.398 1.843.694 2.73l.052.157c.172.509.357.985.52 1.502.15.477.26.997.145 1.492-.124.519-.467.905-.956 1.076-.262.093-.538.148-.814.218l-.946.245-.95.247-.945.245c-.466.121-.932.243-1.396.372-.457.127-.916.26-1.37.4-.395.122-.8.253-1.148.466-.303.183-.534.445-.618.79-.083.34.01.703.154 1.02.217.482.588.895 1.048 1.138.467.246.987.343 1.508.408.6.074 1.202.117 1.805.132 1.14.026 2.283-.024 3.42-.101.88-.06 1.762-.137 2.64-.234.733-.082 1.466-.174 2.196-.28.676-.099 1.35-.211 2.02-.333.538-.097 1.078-.197 1.61-.31.457-.097.917-.198 1.37-.31.427-.107.816-.268 1.162-.506.317-.217.6-.496.74-.856l.094-.25.056-.15c.151-.403.192-.832.15-1.255-.036-.38-.124-.755-.25-1.116l-.066-.192c-.142-.41-.295-.818-.47-1.217-.193-.44-.41-.872-.64-1.296-.233-.43-.483-.849-.737-1.264-.25-.409-.508-.815-.762-1.224-.113-.183-.226-.365-.334-.55-.057-.096-.112-.194-.153-.296a.855.855 0 01-.05-.27c0-.163.063-.32.17-.44.11-.12.258-.186.41-.19h.003c.277-.008.555.075.797.217.263.153.49.367.686.6.193.228.36.477.509.735.153.264.285.539.406.817.245.557.45 1.13.645 1.706.194.578.377 1.16.557 1.743l.006.02c.168.54.33 1.082.488 1.625l.07.24.07-.24c.148-.523.297-1.046.452-1.566.153-.516.312-1.03.479-1.54.169-.516.348-1.027.535-1.533.19-.514.393-1.022.614-1.52.11-.25.226-.496.353-.736.127-.24.264-.473.416-.695.148-.216.31-.422.49-.612.174-.184.364-.354.578-.489.21-.133.44-.225.682-.246a.746.746 0 01.54.163c.147.127.218.316.224.507 0 .092-.014.184-.04.272-.041.139-.103.27-.175.394-.108.19-.225.375-.342.559-.255.41-.513.817-.764 1.228-.254.414-.5.834-.733 1.258-.23.42-.447.847-.638 1.283-.174.405-.328.819-.468 1.236l-.063.19c-.126.37-.212.75-.247 1.135-.041.432.002.87.158 1.278l.057.153.095.247c.14.357.423.636.74.852.348.238.738.399 1.166.506.453.112.913.213 1.37.31.532.113 1.072.213 1.61.31.67.122 1.344.234 2.02.333.73.106 1.463.198 2.196.28.878.097 1.76.174 2.64.234 1.137.077 2.28.127 3.42.101.603-.015 1.205-.058 1.805-.132.521-.065 1.041-.162 1.508-.408.46-.243.831-.656 1.048-1.138.144-.317.237-.68.154-1.02-.084-.345-.315-.607-.618-.79-.348-.213-.753-.344-1.148-.466a54.613 54.613 0 00-1.37-.4c-.464-.129-.93-.251-1.396-.372l-.945-.245-.95-.247-.946-.245c-.276-.07-.552-.125-.814-.218-.489-.171-.832-.557-.956-1.076-.115-.495-.005-1.015.145-1.492.163-.517.348-.993.52-1.502l.052-.157c.296-.887.514-1.81.694-2.73l.208-1.068c.084-.429.177-.866.157-1.303-.026-.558-.183-1.109-.183-1.666V7.6c0-.391.101-.789.437-1.021.273-.194.645-.365.719-.755.076-.39-.179-.822-.438-1.033-.273-.223-.601-.363-.919-.479-.87-.316-1.835-.417-2.75-.5a25.835 25.835 0 00-3.7-.062c-1.027.056-2.077.153-3.077.416-.211.056-.42.12-.626.194-.399.154-.801.388-.996.788-.148.297-.193.662-.25.987-.067.377-.127.755-.192 1.133-.035.206-.079.429-.231.572-.15.143-.373.172-.57.241-.613.216-.882.781-1.001 1.379l-.132.666z"/></svg>
@@ -1022,12 +1041,16 @@
       <div class="intro-tip">💡 Mät M1 från <strong>H-stycket</strong> (övre kopplingen).<br>👉 Börja alltså mäta från den sida där röret ska sluta. Mäter du från T-sidan hamnar böjen fel och röret passar inte.</div>
       <div class="intro-extra">⚙ Så gör du: 1) Fyll i sidmått och höjder. 2) Ange M1 och instick. 3) Klicka Beräkna — appen visar kaplängd och böjmärke.</div>
     </div>
+    <div class="banana-mode-toggle" id="banana-mode-toggle">
+      <button type="button" class="bm-btn active" data-bmode="simple" onclick="setBananaMode('simple')">Enkelt</button>
+      <button type="button" class="bm-btn" data-bmode="advanced" onclick="setBananaMode('advanced')">Avancerat</button>
+    </div>
     <div class="ref-strip" id="banana-ref-strip-input"><strong>← 0 mm — H-styckets ände (överkant)</strong></div>
     <div id="banana-ref-note" class="hint-warn"></div>
     <div class="panel-title">Indata — Bananböj (enkel böj)</div>
 
     <!-- Mode toggle -->
-    <div class="mode-toggle">
+    <div class="mode-toggle banana-advanced-only">
       <button type="button" class="mode-btn active" data-mode="fri"    onclick="setMode('fri')">Fri (D+H→α)</button>
       <button type="button" class="mode-btn"        data-mode="vinkel" onclick="setMode('vinkel')">Vinkelläge (α→H)</button>
     </div>
@@ -1050,8 +1073,9 @@
         <label for="djup">Sidmått</label>
         <input type="number" id="djup" value="45" min="1" step="1" oninput="onLiveInput()" title="Sidmått i millimeter">
         <div class="hint">Centrum till centrum, rakt tvärs [mm]</div>
+        <div id="banana-offset-preview" class="hint banana-simple-only"></div>
       </div>
-      <div class="field">
+      <div class="field banana-advanced-only">
         <label id="hojd-label" for="hojd">Rak stigning <span>(H)</span></label>
         <input type="number" id="hojd" value="66.7" min="1" step="0.5" title="Rak stigning H i millimeter">
         <div class="hint" id="hojd-hint">Höjddifferens längs rörets riktning [mm]</div>
@@ -1078,7 +1102,7 @@
         <input type="number" id="clr" value="43" min="1" step="1" class="computed" readonly>
         <div class="hint">Centerline Radius [mm] — auto vid Fromax</div>
       </div>
-      <div class="field">
+      <div class="field banana-advanced-only">
         <label for="springback">Fjädringstillägg <span>(°)</span></label>
         <input type="number" id="springback" value="1.5" min="0" max="10" step="0.5">
         <div class="hint">Överbocka X° — halvhård Cu ≈ 1–2°, stål ≈ 2–3°</div>
@@ -1086,8 +1110,8 @@
     </div>
 
     <!-- ── VÄGGAVSTÅND ── -->
-    <div class="section-label">Väggavstånd <span class="section-label-accent">(valfritt — positionerar diagram korrekt)</span></div>
-    <div class="input-grid-2">
+    <div class="section-label banana-advanced-only">Väggavstånd <span class="section-label-accent">(valfritt — positionerar diagram korrekt)</span></div>
+    <div class="input-grid-2 banana-advanced-only">
       <div class="field">
         <label for="wallT">Vägg → T-koppling cc</label>
         <input type="number" id="wallT" value="20" min="0" step="1" class="optional" oninput="onWallInput()">
@@ -1101,17 +1125,17 @@
     </div>
 
     <!-- ── MÄTLÄGE ── -->
-    <div class="section-label">Mätläge <span class="section-label-accent">(vilket referensplan mäter du D från?)</span></div>
-    <div class="mm-group">
+    <div class="section-label banana-advanced-only">Mätläge <span class="section-label-accent">(vilket referensplan mäter du D från?)</span></div>
+    <div class="mm-group banana-advanced-only">
       <button type="button" class="mm-btn" data-mode="inside"  onclick="setMeasureMode('inside',  this)">Insida böj</button>
       <button type="button" class="mm-btn active" data-mode="center" onclick="setMeasureMode('center', this)">Centrum (CC)</button>
       <button type="button" class="mm-btn" data-mode="outside" onclick="setMeasureMode('outside', this)">Utsida böj</button>
     </div>
-    <div class="hint mm-hint" id="mm-hint">Centerlinjen används i beräkningen — kapa ändras ej vid CC</div>
+    <div class="hint mm-hint banana-advanced-only" id="mm-hint">Centerlinjen används i beräkningen — kapa ändras ej vid CC</div>
 
     <!-- ── HÖJDER FRÅN GOLV ── -->
-    <div class="section-label">Höjder från golv <span class="section-label-accent">(valfritt — påverkar diagram och α-beräkning)</span></div>
-    <div class="input-grid-2">
+    <div class="section-label banana-advanced-only">Höjder från golv <span class="section-label-accent">(valfritt — påverkar diagram och α-beräkning)</span></div>
+    <div class="input-grid-2 banana-advanced-only">
       <div class="field">
         <label for="hojdA">Höjd A — stam cc <span>(från golv)</span></label>
         <input type="number" id="hojdA" value="70" min="0" step="1" class="optional" oninput="onHeightInput()" title="Höjd A från golv i millimeter">
@@ -1168,6 +1192,13 @@
     <!-- Error -->
     <div class="error-msg" id="error-msg"></div>
 
+    <div id="banana-simple-card" class="banana-simple-card banana-simple-only">
+      <div class="bsc-row"><span class="bsc-label">Kapa röret till</span><span class="bsc-val" id="bsc-kapa">—</span><span class="bsc-unit">mm</span></div>
+      <div class="bsc-row"><span class="bsc-label">Märk M1 från H-stycke-änden</span><span class="bsc-val" id="bsc-m1">—</span><span class="bsc-unit">mm</span></div>
+      <div class="bsc-row bsc-angle"><span class="bsc-label">Böj till</span><span class="bsc-val" id="bsc-angle">—</span><span class="bsc-unit">grader</span></div>
+      <div id="bsc-note" class="hint"></div>
+    </div>
+
     <div class="action-required-header" id="banana-action-header"></div>
     <div class="ref-strip" id="banana-ref-strip-result"></div>
     <div id="banana-clamp-lead-result" class="hint-danger"></div>
@@ -1222,7 +1253,7 @@
       </div>
 
       <!-- Arbetsordning -->
-      <div class="workflow-box" id="workflow-box">
+      <div class="workflow-box banana-advanced-only" id="workflow-box">
         <div class="w-title">// Arbetsordning</div>
         <div id="workflow-steps"></div>
       </div>
@@ -1243,14 +1274,14 @@
 
       <!-- Orientation comparison -->
       <div class="panel-title panel-title-mt">Mätläge — jämförelse</div>
-      <table class="orient-table">
+      <table class="orient-table banana-advanced-only">
         <thead><tr><th>Referens</th><th>Stigning (H)</th></tr></thead>
         <tbody id="orient-tbody"></tbody>
       </table>
-      <div class="hint orient-rotate-note" id="orient-rotate-note"></div>
+      <div class="hint orient-rotate-note banana-advanced-only" id="orient-rotate-note"></div>
 
       <!-- Formula details (collapsible) -->
-      <div class="formula-box mt">
+      <div class="formula-box mt banana-advanced-only">
         <div class="f-title">// Beräkningssteg</div>
         <div class="step">
           <div class="step-num">1</div>
@@ -1307,6 +1338,7 @@
       <div class="diagram-wrap">
         <svg id="diagram" viewBox="0 0 600 260" xmlns="http://www.w3.org/2000/svg"></svg>
       </div>
+      <div id="banana-instick-legend" class="hint banana-instick-legend"></div>
     </div>
 
   </div><!-- /results -->
@@ -2118,6 +2150,7 @@ let orientation = 'horisontell';
 let measureMode = 'center'; // 'center' | 'inside' | 'outside'
 let bendTool    = 'fromax'; // 'fromax' | 'manual'
 let hasCalculatedMain = false;
+let bananaMode = 'simple';
 
 const FROMAX_CLR = { 6: 20, 8: 28, 10: 35, 12: 43, 15: 53, 18: 72, 22: 110 };
 
@@ -3179,6 +3212,8 @@ function setMode(mode) {
     lockedAngle = null;
     document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
   }
+
+  bananaUpdateOffsetPreview();
 }
 
 function setMeasureMode(mode, btn) {
@@ -3192,10 +3227,12 @@ function setAngle(deg, btn) {
   document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   updateHFromAngle();
+  bananaUpdateOffsetPreview();
 }
 
 function onLiveInput() {
   if (calcMode === 'vinkel' && lockedAngle !== null) updateHFromAngle();
+  bananaUpdateOffsetPreview();
 }
 
 function onWallInput() {
@@ -3223,9 +3260,41 @@ function onHeightInput() {
 function updateHFromAngle() {
   const D = parseFloat(document.getElementById('djup').value);
   if (!isNaN(D) && D > 0 && lockedAngle !== null) {
-    const H = D / Math.tan(lockedAngle * Math.PI / 180);
-    document.getElementById('hojd').value = H.toFixed(1);
+    const geo = geParallelOffset(D, lockedAngle);
+    if (geo.L !== Infinity) {
+      document.getElementById('hojd').value = geo.H.toFixed(1);
+    }
   }
+}
+
+function setBananaMode(mode) {
+  bananaMode = mode;
+  sessionStorage.setItem('banana_ui_mode', mode);
+  document.querySelectorAll('#banana-section .banana-advanced-only').forEach(el =>
+    el.classList.toggle('banana-hidden', mode === 'simple'));
+  document.querySelectorAll('#banana-section .banana-simple-only').forEach(el =>
+    el.classList.toggle('banana-hidden', mode === 'advanced'));
+  document.querySelectorAll('#banana-section .bm-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.bmode === mode));
+  const kapaBd = document.querySelector('#kapa-card .kapa-breakdown');
+  if (kapaBd) kapaBd.classList.toggle('banana-hidden', mode === 'simple');
+  if (mode === 'simple' && calcMode !== 'vinkel') {
+    setMode('vinkel');
+  }
+  bananaUpdateOffsetPreview();
+  if (hasCalculatedMain) calculate();
+}
+
+function bananaUpdateOffsetPreview() {
+  const el = document.getElementById('banana-offset-preview');
+  if (!el) return;
+  if (bananaMode !== 'simple') { el.textContent = ''; return; }
+  if (lockedAngle === null) { el.textContent = ''; return; }
+  const D = parseFloat(document.getElementById('djup').value);
+  if (isNaN(D) || D <= 0) { el.textContent = ''; return; }
+  const geo = geParallelOffset(D, lockedAngle);
+  if (geo.L === Infinity) { el.textContent = ''; return; }
+  el.textContent = `Vid ${lockedAngle}° och ${Math.round(D)} mm sidmått: snedlängd ≈ ${Math.round(geo.L)} mm`;
 }
 
 function setPipeSize(size) {
@@ -3334,8 +3403,10 @@ function calculate(forceShow = false) {
     if (isNaN(D) || D <= 0) return;
     alpha_deg = lockedAngle;
     alpha_rad = alpha_deg * Math.PI / 180;
-    L         = D / Math.sin(alpha_rad);
-    H_diag    = D / Math.tan(alpha_rad);   // = L * cos(α)
+    const geo = geParallelOffset(D, alpha_deg);
+    if (geo.L === Infinity) return;
+    L         = geo.L;
+    H_diag    = geo.H;
     document.getElementById('hojd').value = H_diag.toFixed(1);
   } else if (hasHeights) {
     // Derive angle from heights + D
@@ -3434,6 +3505,27 @@ function calculate(forceShow = false) {
   rows += `<tr><td>T-koppling bygger</td><td>${Math.round(tBygg)} mm</td><td>Stam cc → grenrörets mun (ingår i beräkning)</td></tr>`;
   document.getElementById('marks-tbody').innerHTML = rows;
 
+  const simpleCard = document.getElementById('banana-simple-card');
+  if (simpleCard) {
+    if (bananaMode === 'simple') {
+      document.getElementById('bsc-kapa').textContent  = Math.round(kapa);
+      document.getElementById('bsc-m1').textContent    = Math.round(M1);
+      document.getElementById('bsc-angle').textContent = Math.round(alpha_deg);
+      const bscNote = document.getElementById('bsc-note');
+      if (bscNote) {
+        if (!sessionStorage.getItem('banana_simple_tip')) {
+          bscNote.textContent = 'Tips: välj en standardvinkel och ange sidmåttet — du behöver inget mer';
+          sessionStorage.setItem('banana_simple_tip', '1');
+        } else {
+          bscNote.textContent = `Fromax No.55 · CLR ${Math.round(clr)} mm · Böjkorrigering ${Math.round(bendDeduction)} mm`;
+        }
+      }
+      simpleCard.classList.add('visible');
+    } else {
+      simpleCard.classList.remove('visible');
+    }
+  }
+
   // ── Stage 4: result-zone warnings ────────────────────────────────────
   // Clamp lead-in (result zone)
   const clampLeadEl = document.getElementById('banana-clamp-lead-result');
@@ -3525,16 +3617,28 @@ function pipeLines(d, stroke) {
   ].join('');
 }
 
+function updateBananaInstickLegend(show) {
+  const el = document.getElementById('banana-instick-legend');
+  if (!el) return;
+  if (!show) {
+    el.textContent = '';
+    el.classList.add('banana-hidden');
+    return;
+  }
+  el.textContent = 'Solid pipe = fri del · Highlighted = instick i koppling · Marker line = kopplingens mun';
+  el.classList.remove('banana-hidden');
+}
+
 function drawDiagram(D, H_diag, L, alpha_deg, M1, dia, hojdA, hojdB, instA, instB, tBygg, wallT, wallH) {
   if (orientation === 'lodrat') {
     drawVertical(D, H_diag, L, alpha_deg, M1, dia, hojdA, hojdB, instA, instB, tBygg, wallT, wallH);
   } else {
-    drawHorizontal(D, H_diag, L, alpha_deg, M1, dia);
+    drawHorizontal(D, H_diag, L, alpha_deg, M1, dia, instA, instB);
   }
 }
 
 // ── Horizontal diagram (ONE BEND) ─────────────────────────────────────────
-function drawHorizontal(D, H_diag, L, alpha_deg, M1, dia) {
+function drawHorizontal(D, H_diag, L, alpha_deg, M1, dia, instA, instB) {
   const svg = document.getElementById('diagram');
   svg.setAttribute('viewBox', '0 0 600 260');
 
@@ -3555,6 +3659,8 @@ function drawHorizontal(D, H_diag, L, alpha_deg, M1, dia) {
 
   const r = Math.max(20, Math.min(D * 0.85, 45));
   const stroke = Math.max(4, dia * scale * 0.7);
+  const instickStroke = Math.max(2, stroke * 0.45);
+  const instickOpacity = 0.5;
 
   // ONE bend: straight → curve → diagonal to end
   const path = [
@@ -3589,6 +3695,17 @@ function drawHorizontal(D, H_diag, L, alpha_deg, M1, dia) {
 
   html += pipeLines(path, stroke);
 
+  const hMouthX = tx(Math.min(instB, p1x));
+  html += `<line x1="${tx(0)}" y1="${ty(0)}" x2="${hMouthX}" y2="${ty(0)}" stroke="${ACCENT2}" stroke-width="${instickStroke}" stroke-linecap="round" opacity="${instickOpacity}"/>`;
+  html += `<line x1="${hMouthX}" y1="${ty(0)-8}" x2="${hMouthX}" y2="${ty(0)+8}" stroke="${ACCENT2}" stroke-width="1.4" opacity="0.9"/>`;
+  html += `<text x="${tx(0)+6}" y="${ty(0)-12}" fill="${ACCENT2}" font-family="Share Tech Mono" font-size="8">Instick H-stycke: ${Math.round(instB)}mm</text>`;
+
+  const tStartX = tx(Math.max(p1x, endX - instA * ca));
+  const tStartY = ty(Math.max(0, D - instA * sa));
+  html += `<line x1="${tStartX}" y1="${tStartY}" x2="${tx(endX)}" y2="${ty(D)}" stroke="${ACCENT2}" stroke-width="${instickStroke}" stroke-linecap="round" opacity="${instickOpacity}"/>`;
+  html += `<line x1="${tStartX-6}" y1="${tStartY-6}" x2="${tStartX+6}" y2="${tStartY+6}" stroke="${ACCENT2}" stroke-width="1.4" opacity="0.9"/>`;
+  html += `<text x="${tx(endX)-8}" y="${ty(D)-10}" fill="${ACCENT2}" font-family="Share Tech Mono" font-size="8" text-anchor="end">Instick T-koppling: ${Math.round(instA)}mm</text>`;
+
   // M1 mark
   const lx = tx(p1x), ly = ty(0);
   html += `<line x1="${lx}" y1="${ly-18}" x2="${lx}" y2="${ly+18}" stroke="${ACCENT}" stroke-width="2"/>`;
@@ -3607,11 +3724,12 @@ function drawHorizontal(D, H_diag, L, alpha_deg, M1, dia) {
   html += `<line x1="${tx(0)-5}" y1="${ty(0)}" x2="${tx(totalLen)+5}" y2="${ty(0)}" stroke="${TEXT_COL}" stroke-width="1"/>`;
 
   // H-stycke end origin anchor (0 mm reference)
-  html += `<circle cx="${tx(0)}" cy="${ty(0)}" r="5" fill="${ACCENT}" opacity="0.9"/>`;
+  html += `<circle cx="${tx(0)}" cy="${ty(0)}" r="5" fill="${ACCENT}" opacity="1.0"/>`;
   html += `<text x="${tx(0)}" y="${ty(0)+18}" fill="${ACCENT}" font-family="Share Tech Mono" font-size="10" text-anchor="middle" font-weight="bold">0 mm</text>`;
   html += `<text x="${tx(0)}" y="${ty(0)+29}" fill="${ACCENT}" font-family="Share Tech Mono" font-size="8" text-anchor="middle">H-stycke</text>`;
 
   svg.innerHTML = html;
+  updateBananaInstickLegend((svg.parentElement.clientWidth || 680) >= 300);
 }
 
 // ── Vertical diagram (ONE BEND — bananböj) ───────────────────────────────
@@ -3652,6 +3770,8 @@ function drawVertical(D, H_diag, L, alpha_deg, M1, dia, hojdA, hojdB, instA, ins
   const ux = x => ox + x * scale;
   const uy = y => oy - y * scale;
   const stroke = Math.max(4, dia * scale * 0.7);
+  const instickStroke = Math.max(2, stroke * 0.45);
+  const instickOpacity = 0.5;
 
   // Pipe: diagonal exits T-koppling, curves to vertical, straight up into H-stycke
   const pipeStartY = hasCtx ? yBase - instA : 0;   // into T-koppling (diagonal side)
@@ -3699,6 +3819,16 @@ function drawVertical(D, H_diag, L, alpha_deg, M1, dia, hojdA, hojdB, instA, ins
 
   // Pipe
   html += pipeLines(path, stroke);
+
+  const hMouthY = uy(yTop);
+  html += `<line x1="${ux(xH)}" y1="${hMouthY}" x2="${ex}" y2="${ey}" stroke="${ACCENT2}" stroke-width="${instickStroke}" stroke-linecap="round" opacity="${instickOpacity}"/>`;
+  html += `<line x1="${ux(xH)-7}" y1="${hMouthY}" x2="${ux(xH)+7}" y2="${hMouthY}" stroke="${ACCENT2}" stroke-width="1.4" opacity="0.9"/>`;
+  html += `<text x="${ux(xH) + (goesRight ? 12 : -12)}" y="${hMouthY - 16}" fill="${ACCENT2}" font-family="Share Tech Mono" font-size="8" text-anchor="${goesRight ? 'start' : 'end'}">Instick H-stycke: ${Math.round(instB)}mm</text>`;
+
+  const tMouthY = uy(yBase);
+  html += `<line x1="${bx}" y1="${by}" x2="${ux(xT)}" y2="${tMouthY}" stroke="${ACCENT2}" stroke-width="${instickStroke}" stroke-linecap="round" opacity="${instickOpacity}"/>`;
+  html += `<line x1="${ux(xT)-7}" y1="${tMouthY}" x2="${ux(xT)+7}" y2="${tMouthY}" stroke="${ACCENT2}" stroke-width="1.4" opacity="0.9"/>`;
+  html += `<text x="${ux(xT) + (goesRight ? 12 : -12)}" y="${tMouthY + 18}" fill="${ACCENT2}" font-family="Share Tech Mono" font-size="8" text-anchor="${goesRight ? 'start' : 'end'}">Instick T-koppling: ${Math.round(instA)}mm</text>`;
 
   // T-koppling symbol at xT
   if (hasCtx) {
@@ -3797,10 +3927,11 @@ function drawVertical(D, H_diag, L, alpha_deg, M1, dia, hojdA, hojdB, instA, ins
   const hOriginY = hasCtx ? uy(yTop) : uy(yTop);
   const originLabelX = goesRight ? hOriginX - 8 : hOriginX + 8;
   const originAnchor = goesRight ? 'end' : 'start';
-  html += `<circle cx="${hOriginX}" cy="${hOriginY}" r="6" fill="${ACCENT}" opacity="0.95"/>`;
+  html += `<circle cx="${hOriginX}" cy="${hOriginY}" r="6" fill="${ACCENT}" opacity="1.0"/>`;
   html += `<text x="${originLabelX}" y="${hOriginY - 10}" fill="${ACCENT}" font-family="Share Tech Mono" font-size="10" text-anchor="${originAnchor}" font-weight="bold">← 0 mm</text>`;
 
   svg.innerHTML = html;
+  updateBananaInstickLegend((svg.parentElement.clientWidth || 680) >= 300);
 }
 
 // ══ S-BÖJ (PARALLELLFÖRSKJUTNING) ════════════════════════════════════════
@@ -5725,6 +5856,9 @@ window.onload = () => {
   // Default to vertical (lodrat) diagram
   const btnLodrat = document.querySelector('.orient-btn:last-child');
   if (btnLodrat) setOrientation('lodrat', btnLodrat);
+  const savedBananaMode = sessionStorage.getItem('banana_ui_mode') || 'simple';
+  setBananaMode(savedBananaMode);
+  bananaUpdateOffsetPreview();
   calculate();
   // Keep 3D takror view explicitly synced to the intended default mode.
   setViewMode('iso');

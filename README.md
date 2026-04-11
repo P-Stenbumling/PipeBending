@@ -10,11 +10,16 @@ Only `index.html` and `README.md` are public deployment files.
 
 ## Files
 
-- `todo.md`: implementation source of truth; do not modify via AI.
-- `v0.5.5.rules.md`: compressed hard behavior rules.
-- `v0.5.5.md`: full design document for reference.
-- `CLAUDE.md`: strict AI execution constraints.
+- `todo.md`: implementation source of truth for the current release.
+- `CLAUDE.md`: AI execution constraints — priority order, geometry rules, output rules.
 - `index.html`: single-file app implementation.
+
+### v0.5.5
+- `v0.5.5.rules.md`: hard behavior rules (physical correctness, warning hierarchy, rounding).
+
+### v0.5.6
+- `v0.5.6.md`: full design document — Simple/Advanced Mode + Visual Instick.
+- `v0.5.6.rules.md`: behavior rules for UI mode logic and instick visualization.
 
 ## How to prompt Claude
 
