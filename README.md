@@ -117,7 +117,7 @@ Tre 90°-böjar: längs vägg → upp vägg → längs tak → upp genom tak.
 
 ```
 kapa = M1 + L + instA - bendDeduction
-bendDeduction = CLR × (1 - cos α)
+bendDeduction = empiriskt 90°-värde vid Fromax + 90°, annars CLR × (1 - cos α)
 
 H_rise     = hojdB - (hojdA + tBygg)
 freeBefore = M1 - instB
@@ -186,6 +186,7 @@ Skarv ändrar aldrig grundmarkerna — bara hur de fördelas på pjäs 1 och 2.
 - **Deploy:** kopieras till `index.html`, pushas med `README.md`.
 - **SVG-rendering:** genereras med JavaScript, ingen extern lib (utom Zdog för 3D-preview).
 - **Geometri:** alltid centerline (cc). Inside/outside påverkar bara visning, aldrig beräkning.
+- **v0.5.4 motor:** delade hjälpfunktioner för böjavdrag, parallellförskjutning, märkberäkning och klämgrepp används av flera flikar.
 
 ---
 
@@ -202,6 +203,15 @@ Funktioner som saknas baserat på rörmokarpraktik:
 ---
 
 ## Releasehistorik
+
+### v0.5.4
+- Geometry engine: `geBendDeduction`, `geParallelOffset`, `geComputeMarks`, `geCheckClampLength`
+- Bananböj migrerad till delad böjavdragsmotor
+- S-böj migrerad till delad geometri/böjavdragsmotor + icke-blockerande grepplängdsvarning
+- Takoffset migrerad till delad geometri/böjavdragsmotor + icke-blockerande grepplängdsvarning
+- Manual-läge i S-böj/Takoffset varnar om CLR ser ut att vara kvar på Fromax-förval
+- Praktisk visningsregel: arbetsmått i UI visas i hela mm (ingen "170.7 mm" i resultatkort/märkpunkter)
+- Hotfix: Takoffset `toCalculate()` reparerad efter trasigt renderblock som gav `MONO is not defined`
 
 ### v0.5.3
 - Auditfix: Bananböj använder empiriskt böjavdrag vid Fromax + 90° (`MB_EMPIRICAL_90`) istället för CLR-formel

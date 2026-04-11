@@ -947,7 +947,7 @@
       </svg>
     </div>
     <div>
-      <h1>RÖRBOCK <span>// PIPE BENDING CALCULATOR v0.5.3</span></h1>
+      <h1>RÖRBOCK <span>// PIPE BENDING CALCULATOR v0.5.4</span></h1>
     </div>
     <a href="https://buymeacoffee.com/pstenbumling" target="_blank" rel="noopener" class="bmc-btn">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.216 6.415l-.132-.666c-.119-.598-.388-1.163-1.001-1.379-.197-.069-.42-.098-.57-.241-.152-.143-.196-.366-.231-.572-.065-.378-.125-.756-.192-1.133-.057-.325-.102-.69-.25-.987-.195-.4-.597-.634-.996-.788a5.723 5.723 0 00-.626-.194c-1-.263-2.05-.36-3.077-.416a25.834 25.834 0 00-3.7.062c-.915.083-1.88.184-2.75.5-.318.116-.646.256-.919.479-.259.211-.514.643-.438 1.033.074.39.446.561.719.755.336.232.437.63.437 1.021V6.069c0 .557-.157 1.108-.183 1.666-.02.437.073.874.157 1.303l.208 1.068c.18.92.398 1.843.694 2.73l.052.157c.172.509.357.985.52 1.502.15.477.26.997.145 1.492-.124.519-.467.905-.956 1.076-.262.093-.538.148-.814.218l-.946.245-.95.247-.945.245c-.466.121-.932.243-1.396.372-.457.127-.916.26-1.37.4-.395.122-.8.253-1.148.466-.303.183-.534.445-.618.79-.083.34.01.703.154 1.02.217.482.588.895 1.048 1.138.467.246.987.343 1.508.408.6.074 1.202.117 1.805.132 1.14.026 2.283-.024 3.42-.101.88-.06 1.762-.137 2.64-.234.733-.082 1.466-.174 2.196-.28.676-.099 1.35-.211 2.02-.333.538-.097 1.078-.197 1.61-.31.457-.097.917-.198 1.37-.31.427-.107.816-.268 1.162-.506.317-.217.6-.496.74-.856l.094-.25.056-.15c.151-.403.192-.832.15-1.255-.036-.38-.124-.755-.25-1.116l-.066-.192c-.142-.41-.295-.818-.47-1.217-.193-.44-.41-.872-.64-1.296-.233-.43-.483-.849-.737-1.264-.25-.409-.508-.815-.762-1.224-.113-.183-.226-.365-.334-.55-.057-.096-.112-.194-.153-.296a.855.855 0 01-.05-.27c0-.163.063-.32.17-.44.11-.12.258-.186.41-.19h.003c.277-.008.555.075.797.217.263.153.49.367.686.6.193.228.36.477.509.735.153.264.285.539.406.817.245.557.45 1.13.645 1.706.194.578.377 1.16.557 1.743l.006.02c.168.54.33 1.082.488 1.625l.07.24.07-.24c.148-.523.297-1.046.452-1.566.153-.516.312-1.03.479-1.54.169-.516.348-1.027.535-1.533.19-.514.393-1.022.614-1.52.11-.25.226-.496.353-.736.127-.24.264-.473.416-.695.148-.216.31-.422.49-.612.174-.184.364-.354.578-.489.21-.133.44-.225.682-.246a.746.746 0 01.54.163c.147.127.218.316.224.507 0 .092-.014.184-.04.272-.041.139-.103.27-.175.394-.108.19-.225.375-.342.559-.255.41-.513.817-.764 1.228-.254.414-.5.834-.733 1.258-.23.42-.447.847-.638 1.283-.174.405-.328.819-.468 1.236l-.063.19c-.126.37-.212.75-.247 1.135-.041.432.002.87.158 1.278l.057.153.095.247c.14.357.423.636.74.852.348.238.738.399 1.166.506.453.112.913.213 1.37.31.532.113 1.072.213 1.61.31.67.122 1.344.234 2.02.333.73.106 1.463.198 2.196.28.878.097 1.76.174 2.64.234 1.137.077 2.28.127 3.42.101.603-.015 1.205-.058 1.805-.132.521-.065 1.041-.162 1.508-.408.46-.243.831-.656 1.048-1.138.144-.317.237-.68.154-1.02-.084-.345-.315-.607-.618-.79-.348-.213-.753-.344-1.148-.466a54.613 54.613 0 00-1.37-.4c-.464-.129-.93-.251-1.396-.372l-.945-.245-.95-.247-.946-.245c-.276-.07-.552-.125-.814-.218-.489-.171-.832-.557-.956-1.076-.115-.495-.005-1.015.145-1.492.163-.517.348-.993.52-1.502l.052-.157c.296-.887.514-1.81.694-2.73l.208-1.068c.084-.429.177-.866.157-1.303-.026-.558-.183-1.109-.183-1.666V7.6c0-.391.101-.789.437-1.021.273-.194.645-.365.719-.755.076-.39-.179-.822-.438-1.033-.273-.223-.601-.363-.919-.479-.87-.316-1.835-.417-2.75-.5a25.835 25.835 0 00-3.7-.062c-1.027.056-2.077.153-3.077.416-.211.056-.42.12-.626.194-.399.154-.801.388-.996.788-.148.297-.193.662-.25.987-.067.377-.127.755-.192 1.133-.035.206-.079.429-.231.572-.15.143-.373.172-.57.241-.613.216-.882.781-1.001 1.379l-.132.666z"/></svg>
@@ -2036,6 +2036,55 @@ const FROMAX_CLR = { 6: 20, 8: 28, 10: 35, 12: 43, 15: 53, 18: 72, 22: 110 };
 // Overrides CLR formula — real-world material behaviour differs from pure arc geometry
 const MB_EMPIRICAL_90 = { 12: 19, 15: 27 };  // mm; 15mm estimated, update when measured
 
+// ── Geometry engine (v0.5.4) ─────────────────────────────────────────────
+function geBendDeduction(bend) {
+  if (!bend || !bend.angle_deg || !bend.size || bend.clr == null) {
+    return { value: 0, model: 'invalid' };
+  }
+
+  const isNominal90 = Math.abs(bend.angle_deg - 90) < 0.01;
+  if (bend.tool === 'fromax' && isNominal90 && MB_EMPIRICAL_90[bend.size] !== undefined) {
+    return { value: MB_EMPIRICAL_90[bend.size], model: 'empirical' };
+  }
+
+  const rad = bend.angle_deg * Math.PI / 180;
+  return { value: bend.clr * (1 - Math.cos(rad)), model: 'geometric' };
+}
+
+function geParallelOffset(D, angle_deg) {
+  if (angle_deg < 1 || angle_deg > 179) {
+    return { L: Infinity, H: Infinity };
+  }
+
+  const rad = angle_deg * Math.PI / 180;
+  return {
+    L: D / Math.sin(rad),
+    H: D / Math.tan(rad),
+  };
+}
+
+function geComputeMarks(segLengths, deductionValues) {
+  if (deductionValues.length !== segLengths.length - 1) {
+    console.error(
+      `geComputeMarks: expected ${segLengths.length - 1} deductions, got ${deductionValues.length}`
+    );
+    return [];
+  }
+
+  const marks = [];
+  let pos = 0;
+  for (let i = 0; i < segLengths.length; i++) {
+    pos += i === 0 ? segLengths[i] : segLengths[i] - deductionValues[i - 1];
+    marks.push(pos);
+  }
+  return marks;
+}
+
+function geCheckClampLength(segLength, pipeSize) {
+  const minRequired = 2 * pipeSize;
+  return { ok: segLength >= minRequired, minRequired };
+}
+
 // ── UI controls ───────────────────────────────────────────────────────────
 function setTab(el) {
   if (el.classList.contains('soon')) return;
@@ -3089,11 +3138,9 @@ function calculate(forceShow = false) {
     L         = Math.sqrt(D*D + H_diag*H_diag);
   }
 
-  // Bend deduction: empirical for Fromax 90°, CLR-based for other cases
-  const isEmpirical90 = bendTool === 'fromax' && Math.abs(alpha_deg - 90) < 0.0001 && MB_EMPIRICAL_90[dia] !== undefined;
-  const bendDeduction = isEmpirical90
-    ? MB_EMPIRICAL_90[dia]
-    : clr * (1 - Math.cos(alpha_rad));
+  const _bd = geBendDeduction({ angle_deg: alpha_deg, tool: bendTool, size: dia, clr });
+  if (_bd.model === 'invalid') return;
+  const bendDeduction = _bd.value;
 
   // ONE BEND formula: kapa = M1 + L + instA − bend_deduction  (M1 measured from H-stycke end)
   const kapa = M1 + L + instA - bendDeduction;
@@ -3128,7 +3175,7 @@ function calculate(forceShow = false) {
   }
   document.getElementById('f3').innerHTML =
     `M1 = <em>${fmt(M1,0)} mm</em> från överkant (instick ${fmt(instB,0)}mm i H + fri ${fmt(freeBefore,1)}mm)`;
-  document.getElementById('f3b').innerHTML = isEmpirical90
+  document.getElementById('f3b').innerHTML = _bd.model === 'empirical'
     ? `Empiriskt böjavdrag (Fromax 90°) = <em>−${fmt(bendDeduction,1)} mm</em>`
     : `CLR×(1−cos ${fmt(alpha_deg,1)}°) = ${fmt(clr,0)}×${fmt(1-Math.cos(alpha_rad),3)} = <em>−${fmt(bendDeduction,1)} mm</em>`;
   document.getElementById('f4').innerHTML =
@@ -3158,7 +3205,7 @@ function calculate(forceShow = false) {
   // ── Marks table ───────────────────────────────────────────────────────
   let rows = '';
   rows += `<tr><td>Rör att kapa</td><td>${fmt(kapa,0)} mm</td><td>Rörkniv/kapmaskin</td></tr>`;
-  rows += `<tr><td>${isEmpirical90 ? 'Böjkorrigering (empiriskt 90°)' : `Böjkorrigering (CLR=${fmt(clr,0)})`}</td><td>−${fmt(bendDeduction,1)} mm</td><td>Ingår i kapa</td></tr>`;
+  rows += `<tr><td>${_bd.model === 'empirical' ? 'Böjkorrigering (empiriskt 90°)' : `Böjkorrigering (CLR=${fmt(clr,0)})`}</td><td>−${fmt(bendDeduction,1)} mm</td><td>Ingår i kapa</td></tr>`;
   rows += `<tr><td>M1 — Bockningsmärke</td><td>${fmt(M1,0)} mm</td><td>Böj till ${springbackAngle}° (fjädring +${springback}°) — mäts från H-stycke-änden (överkant)</td></tr>`;
   rows += `<tr><td>Instick A (T-koppling)</td><td>${fmt(instA,0)} mm</td><td>Underkant in i T-koppling (diagonalt)</td></tr>`;
   rows += `<tr><td>Instick B (H-stycke)</td><td>${fmt(instB,0)} mm</td><td>Överkant in i H-stycke (rakt)</td></tr>`;
@@ -3597,16 +3644,30 @@ function sbCalculate() {
   const rB  = parseFloat(document.getElementById('sb-end').value)    || 0;
   const size = parseFloat(document.getElementById('sb-diam').value)  || 12;
 
+  const clr = parseFloat(document.getElementById('sb-clr').value) || 43;
+  const geo = geParallelOffset(D, A);
+  if (geo.L === Infinity) {
+    showSuggestion('sb-warning', 'Vinkeln är ogiltig.', ['Välj en vinkel mellan 1° och 179°']);
+    hideSuccess('sb-success');
+    sbToggleAutoFix(false);
+    document.getElementById('sbend-results').style.display = 'block';
+    return;
+  }
+
+  const { L, H } = geo;
   const rad = A * Math.PI / 180;
-  const L   = D / Math.sin(rad);      // pipe length M1→M2
-  const H   = D / Math.tan(rad);      // axial distance of diagonal (projection)
   const M2  = M1 + L;
   const cut = M1 + L + rB;
 
-  const clr = parseFloat(document.getElementById('sb-clr').value) || 43;
-  const bd  = (sbBendTool === 'fromax' && A === 90 && MB_EMPIRICAL_90[size] !== undefined)
-    ? MB_EMPIRICAL_90[size]
-    : clr * (1 - Math.cos(rad));
+  const _bd = geBendDeduction({ angle_deg: A, tool: sbBendTool, size, clr });
+  if (_bd.model === 'invalid') {
+    showSuggestion('sb-warning', 'Kontrollera böjinställningen.', ['Böjvinkel, rörstorlek och CLR måste vara ifyllda.']);
+    hideSuccess('sb-success');
+    sbToggleAutoFix(false);
+    document.getElementById('sbend-results').style.display = 'block';
+    return;
+  }
+  const bd = _bd.value;
 
   if (H < 30) {
     const minSideForAngle = Math.ceil(30 * Math.tan(rad));
@@ -3623,8 +3684,32 @@ function sbCalculate() {
     hideSuccess('sb-success');
     sbToggleAutoFix(true);
   } else {
-    hideSuggestion('sb-warning');
-    showSuccess('sb-success', 'Geometrin fungerar - redo att bocka.');
+    const warns = [];
+    const fromaxClr = FROMAX_CLR[size] || FROMAX_CLR[12];
+    if (sbBendTool === 'manual' && clr === fromaxClr) {
+      warns.push('CLR-värdet ser ut som Fromax-förval.');
+      warns.push(`Manuellt läge: kontrollera att ${clr} mm verkligen är CLR för ditt verktyg.`);
+    }
+
+    const clampIn = geCheckClampLength(M1, size);
+    if (!clampIn.ok) {
+      warns.push(`Minst ${clampIn.minRequired} mm rekommenderas före M1 — nu ${M1.toFixed(0)} mm.`);
+      warns.push('Lägg till mer rör före M1 så bockarverktyget får bättre grepp.');
+    } else {
+      const clampOut = geCheckClampLength(rB, size);
+      if (!clampOut.ok) {
+        warns.push(`Röret är kort efter sista böjen: minst ${clampOut.minRequired} mm rekommenderas — nu ${rB.toFixed(0)} mm.`);
+        warns.push('Det kan vara svårt att hålla röret stabilt vid sista böjen.');
+      }
+    }
+
+    if (warns.length) {
+      showSuggestion('sb-warning', 'Kontrollera innan du bockar:', warns);
+      hideSuccess('sb-success');
+    } else {
+      hideSuggestion('sb-warning');
+      showSuccess('sb-success', 'Geometrin fungerar - redo att bocka.');
+    }
     sbToggleAutoFix(false);
   }
 
@@ -4146,36 +4231,59 @@ function toCalculate() {
   const rB  = parseFloat(document.getElementById('to-end').value) || 0;
   const size = parseFloat(document.getElementById('to-diam').value) || 12;
   const D   = h2 - h1;
-
-  const warnEl = document.getElementById('to-warning');
+  const clr = parseFloat(document.getElementById('to-clr').value) || 43;
 
   // Fatal: D must be positive
   if (D <= 0) {
     showSuggestion('to-warning',
       'Målhöjden måste vara högre än nuvarande höjd.',
       [
-        `Nuvarande höjd (h1) = ${h1} mm, målhöjd (h2) = ${h2} mm`,
+        `Nuvarande avstånd till tak = ${h1} mm, mål-avstånd till tak = ${h2} mm`,
         `Sätt h2 högre än h1 — skillnaden blir sidmåttet`,
       ]);
     document.getElementById('takoffset-results').style.display = 'block';
     return;
   }
 
-  const rad = A * Math.PI / 180;
-  const L   = D / Math.sin(rad);
-  const H   = D / Math.tan(rad);
+  const geo = geParallelOffset(D, A);
+  if (geo.L === Infinity) {
+    showSuggestion('to-warning', 'Vinkeln är ogiltig.', ['Välj en vinkel mellan 1° och 179°']);
+    document.getElementById('takoffset-results').style.display = 'block';
+    return;
+  }
+
+  const { L, H } = geo;
   const M2  = M1 + L;
   const cut = M1 + L + rB;
 
-  const clr = parseFloat(document.getElementById('to-clr').value) || 43;
-  const bd  = (toBendTool === 'fromax' && A === 90 && MB_EMPIRICAL_90[size] !== undefined)
-    ? MB_EMPIRICAL_90[size]
-    : clr * (1 - Math.cos(rad));
+  const _bd = geBendDeduction({ angle_deg: A, tool: toBendTool, size, clr });
+  if (_bd.model === 'invalid') {
+    showSuggestion('to-warning', 'Kontrollera böjinställningen.', ['Böjvinkel, rörstorlek och CLR måste vara ifyllda.']);
+    document.getElementById('takoffset-results').style.display = 'block';
+    return;
+  }
+  const bd = _bd.value;
 
   // Warnings
   const warns = [];
+  const fromaxClr = FROMAX_CLR[size] || FROMAX_CLR[12];
+  if (toBendTool === 'manual' && clr === fromaxClr) {
+    warns.push('CLR-värdet ser ut som Fromax-förval.');
+    warns.push(`Manuellt läge: kontrollera att ${clr} mm verkligen är CLR för ditt verktyg.`);
+  }
   if (h1 < 40) warns.push(`Röret sitter bara ${h1} mm från taket — det är väldigt trångt. Kontrollera att böjen får plats.`);
   if (H < 30)  warns.push(`Längs-sträckan längs väggen är bara ${H.toFixed(0)} mm — prova en mindre vinkel, t.ex. ${A > 30 ? A-15 : 15}°.`);
+  const clampIn = geCheckClampLength(M1, size);
+  if (!clampIn.ok) {
+    warns.push(`Minst ${clampIn.minRequired} mm rekommenderas före M1 — nu ${M1.toFixed(0)} mm.`);
+    warns.push('Lägg till mer rör före M1 så bockarverktyget får bättre grepp.');
+  } else {
+    const clampOut = geCheckClampLength(rB, size);
+    if (!clampOut.ok) {
+      warns.push(`Röret är kort efter sista böjen: minst ${clampOut.minRequired} mm rekommenderas — nu ${rB.toFixed(0)} mm.`);
+      warns.push('Det kan vara svårt att hålla röret stabilt vid sista böjen.');
+    }
+  }
   if (warns.length) {
     showSuggestion('to-warning', 'Kontrollera måtten innan du börjar borra:', warns);
   } else {
@@ -4183,70 +4291,60 @@ function toCalculate() {
   }
 
   document.getElementById('takoffset-results').style.display = 'block';
-  document.getElementById('to-cut').textContent   = cut.toFixed(1);
-  document.getElementById('to-D-out').textContent = D.toFixed(1);
-  document.getElementById('to-L-out').textContent = L.toFixed(1);
-  document.getElementById('to-H-out').textContent = H.toFixed(1);
+  document.getElementById('to-cut').textContent   = cut.toFixed(0);
+  document.getElementById('to-D-out').textContent = D.toFixed(0);
+  document.getElementById('to-L-out').textContent = L.toFixed(0);
+  document.getElementById('to-H-out').textContent = H.toFixed(0);
   document.getElementById('to-note-h1').textContent = h1;
   document.getElementById('to-note-h2').textContent = h2;
 
   document.getElementById('to-marks-grid').innerHTML = `
-    <div ccccccdcunnvihnefnjgilveukujhtjvihrgrlcfbldut
-        font-family="${MONO}" font-size="9" text-anchor="middle">${M1.toFixed(0)}</text>`;
+    <div class="sb-mark-card sb-mark-highlight">
+      <div class="sb-mark-label">M1 — Böj 1</div>
+      <div><span class="sb-mark-val">${M1.toFixed(0)}</span> <span class="sb-mark-unit">mm</span></div>
+      <div class="sb-mark-dir">◄ Vänster</div>
+    </div>
+    <div class="sb-mark-card sb-mark-highlight">
+      <div class="sb-mark-label">M2 — Böj 2</div>
+      <div><span class="sb-mark-val">${M2.toFixed(0)}</span> <span class="sb-mark-unit">mm</span></div>
+      <div class="sb-mark-dir">Höger ►</div>
+    </div>
+    <div class="sb-mark-card">
+      <div class="sb-mark-label">Böjavdrag × 2</div>
+      <div><span class="sb-mark-val sb-mark-danger">${(bd * 2).toFixed(0)}</span> <span class="sb-mark-unit">mm</span></div>
+      <div class="sb-mark-dir">Per böj: ${bd.toFixed(0)} mm</div>
+    </div>`;
 
-  // ── M2 mark ───────────────────────────────────────────────────────────────
-  h += `<line x1="${xM2}" y1="${yLow - 8}" x2="${xM2}" y2="${yLow + 12}"
-    stroke="${ACC}" stroke-width="2"/>`;
-  h += `<text x="${xM2}" y="${yLow - 14}" fill="${ACC}"
-    font-family="${MONO}" font-size="10" text-anchor="middle" font-weight="bold">M2</text>`;
-  h += `<text x="${xM2}" y="${yLow + 24}" fill="${DIM}"
-    font-family="${MONO}" font-size="9" text-anchor="middle">${(M1 + L).toFixed(0)}</text>`;
+  const svg = document.getElementById('takoffset-svg');
+  if (svg) {
+    const W = svg.parentElement.clientWidth || 680;
+    const Hsvg = 220;
+    const pad = 40;
+    const total = Math.max(1, M1 + L + rB);
+    const sc = (W - pad * 2) / total;
+    const xS = pad;
+    const xM1 = pad + M1 * sc;
+    const xM2 = pad + (M1 + L) * sc;
+    const xE = pad + total * sc;
+    const yHigh = 62;
+    const yLow = 156;
 
-  // ── Context pipes (ceiling-run before, after-run after) ──────────────────
-  const CTXPIPE = '#2a4a38';  // dimmed green for context sections
-  if (ceilRun > 0) {
-    const cxLen = Math.min(ceilRun * sc, xS - 4);
-    const cxS   = xS - cxLen;
-    h += `<line x1="${cxS}" y1="${yHigh}" x2="${xS}" y2="${yHigh}"
-      stroke="#111a10" stroke-width="9" stroke-linecap="round"/>`;
-    h += `<line x1="${cxS}" y1="${yHigh}" x2="${xS}" y2="${yHigh}"
-      stroke="${CTXPIPE}" stroke-width="5" stroke-linecap="round" opacity="0.7"/>`;
-    h += `<text x="${(cxS + xS)/2}" y="${yHigh + 22}" fill="${DIM}"
-      font-family="${MONO}" font-size="8" text-anchor="middle">${ceilRun} mm</text>`;
+    let h = '';
+    h += `<line x1="${xS}" y1="${yHigh}" x2="${xM1}" y2="${yHigh}" stroke="#5fcf80" stroke-width="5" stroke-linecap="round"/>`;
+    h += `<line x1="${xM1}" y1="${yHigh}" x2="${xM2}" y2="${yLow}" stroke="#e8a020" stroke-width="5" stroke-linecap="round"/>`;
+    h += `<line x1="${xM2}" y1="${yLow}" x2="${xE}" y2="${yLow}" stroke="#5fcf80" stroke-width="5" stroke-linecap="round"/>`;
+
+    h += `<line x1="${xM1}" y1="${yHigh - 10}" x2="${xM1}" y2="${yHigh + 10}" stroke="#e8a020" stroke-width="2"/>`;
+    h += `<line x1="${xM2}" y1="${yLow - 10}" x2="${xM2}" y2="${yLow + 10}" stroke="#e8a020" stroke-width="2"/>`;
+
+    h += `<text x="${xM1}" y="${yHigh - 14}" fill="#e8a020" font-family="Share Tech Mono" font-size="10" text-anchor="middle">M1 ${M1.toFixed(0)}</text>`;
+    h += `<text x="${xM2}" y="${yLow + 24}" fill="#e8a020" font-family="Share Tech Mono" font-size="10" text-anchor="middle">M2 ${M2.toFixed(0)}</text>`;
+    h += `<text x="${(xM1 + xM2) / 2}" y="${(yHigh + yLow) / 2 - 8}" fill="#3a4a35" font-family="Share Tech Mono" font-size="9" text-anchor="middle">L ${L.toFixed(0)} mm</text>`;
+
+    svg.setAttribute('viewBox', `0 0 ${W} ${Hsvg}`);
+    svg.setAttribute('height', String(Hsvg));
+    svg.innerHTML = h;
   }
-  if (afterRun > 0) {
-    const axLen = Math.min(afterRun * sc, W - xE - padR + 20);
-    const axE   = xE + axLen;
-    h += `<line x1="${xE}" y1="${yLow}" x2="${axE}" y2="${yLow}"
-      stroke="#111a10" stroke-width="9" stroke-linecap="round"/>`;
-    h += `<line x1="${xE}" y1="${yLow}" x2="${axE}" y2="${yLow}"
-      stroke="${CTXPIPE}" stroke-width="5" stroke-linecap="round" opacity="0.7"/>`;
-    // 90° bend stub at end
-    h += `<line x1="${axE}" y1="${yLow}" x2="${axE}" y2="${yLow + 22}"
-      stroke="${CTXPIPE}" stroke-width="5" stroke-linecap="round" opacity="0.5"/>`;
-    h += `<text x="${(xE + axE)/2}" y="${yLow + 22}" fill="${DIM}"
-      font-family="${MONO}" font-size="8" text-anchor="middle">${afterRun} mm</text>`;
-    h += `<text x="${axE + 4}" y="${yLow + 18}" fill="${DIM}"
-      font-family="${MONO}" font-size="8">90°</text>`;
-  }
-
-  // Start/end labels
-  h += `<text x="${xS}"  y="${yHigh + 22}" fill="${DIM}"
-    font-family="${MONO}" font-size="9" text-anchor="middle">0</text>`;
-  h += `<text x="${xE}"  y="${yLow - 14}"  fill="${DIM}"
-    font-family="${MONO}" font-size="9" text-anchor="middle">${(M1+L+rB).toFixed(0)}</text>`;
-
-  // L label on diagonal
-  h += `<text x="${(xM1+xM2)/2 - 6}" y="${(yHigh+yLow)/2 - 7}" fill="${DIM}"
-    font-family="${MONO}" font-size="9">L=${L.toFixed(0)}</text>`;
-
-  // Angle labels
-  h += `<text x="${xM1 + 10}" y="${yHigh - 4}" fill="${ACC}" font-family="${MONO}" font-size="9">${A}°</text>`;
-  h += `<text x="${xM2 + 10}" y="${yLow + 14}" fill="${ACC}" font-family="${MONO}" font-size="9">${A}°</text>`;
-
-  svg.setAttribute('viewBox', `0 0 ${W} ${svgH}`);
-  svg.setAttribute('height', svgH);
-  svg.innerHTML = h;
 }
 
 // ══ TAKRÖR 90° ═══════════════════════════════════════════════════════════
