@@ -765,6 +765,13 @@
     font-size:0.8rem; cursor:pointer; font-family:'Share Tech Mono', monospace;
   }
   .sbm-btn.active { background:var(--accent); color:#000; font-weight:bold; border-color:var(--accent); }
+  .sw-mode-toggle, .to-mode-toggle, .tr-mode-toggle { display:flex; gap:6px; margin-bottom:10px; }
+  .swm-btn, .tom-btn, .trm-btn {
+    padding:5px 14px; border-radius:4px; border:1px solid var(--border);
+    background:var(--surface); color:var(--text-dim);
+    font-size:0.8rem; cursor:pointer; font-family:'Share Tech Mono', monospace;
+  }
+  .swm-btn.active, .tom-btn.active, .trm-btn.active { background:var(--accent); color:#000; font-weight:bold; border-color:var(--accent); }
   .sb-hidden { display:none !important; }
   .sb-simple-card {
     display:none; background:#161b18; border:1px solid var(--border);
@@ -775,6 +782,7 @@
   .sbsc-label { color:var(--text-dim); font-size:0.82rem; flex:1; }
   .sbsc-val { font-size:1.45rem; font-weight:bold; color:var(--accent); font-family:'Share Tech Mono', monospace; }
   .sbsc-unit { color:var(--text-dim); font-size:0.78rem; }
+  .sw-hidden, .to-hidden, .tr-hidden { display:none !important; }
 
   .sb-result-hero {
     display: flex; gap: 0; margin-bottom: 16px;
@@ -1730,6 +1738,10 @@
         <div class="intro-extra">⚙ Så gör du: 1) Fyll i sidmått och total höjd. 2) Klicka Beräkna. 3) Märk upp M1, M2, M3 i ordning från röränden.</div>
       </div>
       <div id="sw-intent" class="sb-intent"></div>
+      <div class="sw-mode-toggle" id="sw-mode-toggle">
+        <button type="button" class="swm-btn active" data-swmode="simple" onclick="swSetMode('simple')">Enkelt</button>
+        <button type="button" class="swm-btn" data-swmode="advanced" onclick="swSetMode('advanced')">Avancerat</button>
+      </div>
       <div class="panel-title">Indata — Svanbock (3-böjserie, vertikal)</div>
 
       <div class="mb-top-grid">
@@ -1754,7 +1766,7 @@
           </div>
           <input type="hidden" id="sw-angle" value="45">
         </div>
-        <div class="field">
+        <div class="field sw-advanced-only">
           <label for="sw-clr">CLR <span>(böjradie)</span></label>
           <div class="bt-group">
             <button type="button" class="bt-btn active" data-tool="fromax" onclick="swSetBendTool('fromax')">Fromax</button>
@@ -1797,7 +1809,7 @@
         </div>
       </div>
 
-      <div class="sb-quick-actions">
+      <div class="sb-quick-actions sw-advanced-only">
         <button type="button" class="sb-example-btn" onclick="swLoadExample()">Testa med exempelmått</button>
       </div>
 
@@ -1805,6 +1817,13 @@
     </div>
 
     <div id="swan-results">
+      <div id="sw-simple-card" class="sb-simple-card sw-simple-only">
+        <div class="sbsc-row"><span class="sbsc-label">Kapa röret till</span><span class="sbsc-val" id="swsc-cut">—</span><span class="sbsc-unit">mm</span></div>
+        <div class="sbsc-row"><span class="sbsc-label">Märk M1 från referensänden</span><span class="sbsc-val" id="swsc-m1">—</span><span class="sbsc-unit">mm</span></div>
+        <div class="sbsc-row"><span class="sbsc-label">Märk M2 från referensänden</span><span class="sbsc-val" id="swsc-m2">—</span><span class="sbsc-unit">mm</span></div>
+        <div class="sbsc-row"><span class="sbsc-label">Märk M3 från referensänden</span><span class="sbsc-val" id="swsc-m3">—</span><span class="sbsc-unit">mm</span></div>
+        <div id="swsc-note" class="hint"></div>
+      </div>
       <div class="action-required-header" id="sw-action-header"></div>
       <div class="sb-success" id="sw-success"></div>
       <div class="sb-warning" id="sw-warning"></div>
@@ -1832,11 +1851,11 @@
         <div class="sb-marks-grid" id="sw-marks-grid"></div>
         <div id="sw-clamp-tail-result" class="hint-danger"></div>
         <div id="sw-m1-suspicious" class="hint-warn"></div>
-        <div class="sb-worklist" id="sw-worklist"></div>
-        <div class="sb-diagram-wrap">
+        <div class="sb-worklist sw-advanced-only" id="sw-worklist"></div>
+        <div class="sb-diagram-wrap sw-advanced-only">
           <svg id="swan-svg" xmlns="http://www.w3.org/2000/svg"></svg>
         </div>
-        <div class="note sb-note-gap">
+        <div class="note sb-note-gap sw-advanced-only">
           Märk från samma ändpunkt. Böj 1 (M1): vänster — Böj 2 (M2): höger — Böj 3 (M3): vänster.
         </div>
       </div>
@@ -1859,6 +1878,10 @@
         </ul>
         <div class="intro-tip">💡 h1 och h2 mäts alltid till rörcentrum (cc) — inte till utsidan av röret.</div>
         <div class="intro-extra">⚙ Appen räknar automatiskt ut clearance mot takbocken och varnar om utrymmet är för litet.</div>
+      </div>
+      <div class="to-mode-toggle" id="to-mode-toggle">
+        <button type="button" class="tom-btn active" data-tomode="simple" onclick="toSetMode('simple')">Enkelt</button>
+        <button type="button" class="tom-btn" data-tomode="advanced" onclick="toSetMode('advanced')">Avancerat</button>
       </div>
       <div class="to-clearance-tag">Automatisk kontroll av utrymme mot takböj</div>
       <div class="panel-title">Indata — Takoffset (S-böj vid takinstallation)</div>
@@ -1885,7 +1908,7 @@
           </div>
           <input type="hidden" id="to-angle" value="45">
         </div>
-        <div class="field">
+        <div class="field to-advanced-only">
           <label for="to-clr">CLR <span>(böjradie)</span></label>
           <div class="bt-group">
             <button type="button" class="bt-btn active" data-tool="fromax" onclick="toSetBendTool('fromax')">Fromax</button>
@@ -1935,8 +1958,8 @@
       </div>
 
       <!-- Optional: pipe along ceiling before S-bend -->
-      <div class="section-label">Rör längs tak <span class="section-label-accent">(valfritt — visas i diagram)</span></div>
-      <div class="input-grid-2">
+      <div class="section-label to-advanced-only">Rör längs tak <span class="section-label-accent">(valfritt — visas i diagram)</span></div>
+      <div class="input-grid-2 to-advanced-only">
         <div class="field">
           <label for="to-ceiling-run">Rörsträcka längs tak</label>
           <input type="number" id="to-ceiling-run" value="200" min="0" step="10">
@@ -1953,6 +1976,12 @@
     </div>
 
     <div id="takoffset-results">
+      <div id="to-simple-card" class="sb-simple-card to-simple-only">
+        <div class="sbsc-row"><span class="sbsc-label">Kapa röret till</span><span class="sbsc-val" id="tosc-cut">—</span><span class="sbsc-unit">mm</span></div>
+        <div class="sbsc-row"><span class="sbsc-label">Märk M1 från referensänden</span><span class="sbsc-val" id="tosc-m1">—</span><span class="sbsc-unit">mm</span></div>
+        <div class="sbsc-row"><span class="sbsc-label">Märk M2 från referensänden</span><span class="sbsc-val" id="tosc-m2">—</span><span class="sbsc-unit">mm</span></div>
+        <div id="tosc-note" class="hint"></div>
+      </div>
       <div class="sb-warning" id="to-warning"></div>
 
       <div class="sb-result-hero">
@@ -1980,13 +2009,13 @@
         <div id="to-lead-result" class="hint-danger"></div>
         <div id="to-tail-result" class="hint-danger"></div>
         <div class="sb-marks-grid" id="to-marks-grid"></div>
-        <div class="sb-diagram-wrap">
+        <div class="sb-diagram-wrap to-advanced-only">
           <svg id="takoffset-svg" xmlns="http://www.w3.org/2000/svg"></svg>
         </div>
         <!-- 90° clearance result -->
         <div id="to-clr-check" class="to-clr-check"></div>
 
-        <div class="note sb-note-gap">
+        <div class="note sb-note-gap to-advanced-only">
           S-böj vid tak: röret förflyttas från h1 = <em id="to-note-h1">—</em> mm till h2 = <em id="to-note-h2">—</em> mm från taket.
           Böj M1 (vänster) före S-kurvan, M2 (höger) efter.
         </div>
@@ -2012,8 +2041,12 @@
         <div class="intro-tip">💡 Mät S3 till hålets mitt — inte till takets kant. S4 är vad som sticker upp, inte hålets djup.</div>
         <div class="intro-extra">⚙ Frontvy, sidovy och 3D-vy hjälper dig verifiera installationen innan du börjar borra och bänka.</div>
       </div>
+      <div class="tr-mode-toggle" id="tr-mode-toggle">
+        <button type="button" class="trm-btn active" data-trmode="simple" onclick="trSetMode('simple')">Enkelt</button>
+        <button type="button" class="trm-btn" data-trmode="advanced" onclick="trSetMode('advanced')">Avancerat</button>
+      </div>
       <div class="panel-title">Takrör — 3 st 90°-böjar, upp genom tak</div>
-      <div class="note tr-intro-note">
+      <div class="note tr-intro-note tr-advanced-only">
         S1 horisontellt längs vägg → M1 (90° uppåt) → S2 vertikalt längs vägg →
         M2 (90° ut längs tak) → S3 längs tak → M3 (90° upp genom tak) → S4 ovan tak.
       </div>
@@ -2050,7 +2083,7 @@
           <div class="hint">Rörets cc till takytan [mm]</div>
         </div>
       </div>
-      <div class="input-grid-2">
+      <div class="input-grid-2 tr-advanced-only">
         <div class="field">
           <label for="tr-wallgap">Avstånd rör–vägg <span>(w)</span></label>
           <input type="number" id="tr-wallgap" value="20" min="1" step="5">
@@ -2070,7 +2103,7 @@
           </div>
           <input type="hidden" id="tr-diam" value="12">
         </div>
-        <div class="field">
+        <div class="field tr-advanced-only">
           <label for="tr-m1ref">Rör före M1 <span>(valfritt)</span></label>
           <input type="number" id="tr-m1ref" value="0" min="0" step="10" class="optional">
           <div class="hint">Extra rör innan första böj [mm]</div>
@@ -2081,6 +2114,13 @@
     </div>
 
     <div id="tr-results">
+      <div id="tr-simple-card" class="sb-simple-card tr-simple-only">
+        <div class="sbsc-row"><span class="sbsc-label">Kapa röret till</span><span class="sbsc-val" id="trsc-cut">—</span><span class="sbsc-unit">mm</span></div>
+        <div class="sbsc-row"><span class="sbsc-label">Märk M1 från START</span><span class="sbsc-val" id="trsc-m1">—</span><span class="sbsc-unit">mm</span></div>
+        <div class="sbsc-row"><span class="sbsc-label">Märk M2 från START</span><span class="sbsc-val" id="trsc-m2">—</span><span class="sbsc-unit">mm</span></div>
+        <div class="sbsc-row"><span class="sbsc-label">Märk M3 från START</span><span class="sbsc-val" id="trsc-m3">—</span><span class="sbsc-unit">mm</span></div>
+        <div id="trsc-note" class="hint"></div>
+      </div>
 
       <div class="sb-result-hero">
         <div class="sb-hero-cell">
@@ -2107,19 +2147,19 @@
         <div class="sb-marks-grid" id="tr-marks-grid"></div>
 
         <!-- Front elevation: looking at wall face-on -->
-        <div class="section-label mb-diagram-label">Frontvy — sett rakt mot vägg (S1 + S2 synliga)</div>
-        <div class="sb-diagram-wrap">
+        <div class="section-label mb-diagram-label tr-advanced-only">Frontvy — sett rakt mot vägg (S1 + S2 synliga)</div>
+        <div class="sb-diagram-wrap tr-advanced-only">
           <svg id="takror-svg" xmlns="http://www.w3.org/2000/svg"></svg>
         </div>
 
         <!-- Side elevation: looking from the side (-X direction) -->
-        <div class="section-label mb-diagram-label">Sidovy — sett från sidan (S2 + S3 + S4 synliga)</div>
-        <div class="tr-side-wrap">
+        <div class="section-label mb-diagram-label tr-advanced-only">Sidovy — sett från sidan (S2 + S3 + S4 synliga)</div>
+        <div class="tr-side-wrap tr-advanced-only">
           <svg id="takror-side-svg" xmlns="http://www.w3.org/2000/svg"></svg>
         </div>
 
         <!-- 3D view with mode toggle -->
-        <div class="section-label mb-diagram-label tr-3d-head">
+        <div class="section-label mb-diagram-label tr-3d-head tr-advanced-only">
           <span>3D-vy</span>
           <span class="tr-3d-view-buttons">
             <button type="button" id="btn-view-iso"  class="orient-btn active" onclick="setViewMode('iso')">Isometrisk</button>
@@ -2131,12 +2171,12 @@
             <button type="button" id="btn-persp-clear" class="tr-preset-btn active" onclick="setTrPerspPreset('clear')">Visuell</button>
           </span>
         </div>
-        <div class="tr-3d-wrap">
+        <div class="tr-3d-wrap tr-advanced-only">
           <svg id="takror-3d-svg" xmlns="http://www.w3.org/2000/svg"></svg>
           <canvas id="takror-3d-canvas"></canvas>
         </div>
 
-        <div class="note sb-note-gap">
+        <div class="note sb-note-gap tr-advanced-only">
           Böjavdrag 90° med Fromax No.55: <em id="tr-bd-note">19 mm</em> per böj (empiriskt).
           Märk från <em>samma ände</em> — rörändpunkten är referensen.
         </div>
@@ -4504,6 +4544,43 @@ function sbDrawDiagram(M1, L, rB, D, H, A) {
 
 // ══ SVANBOCK (3-BÖJSERIE) ═════════════════════════════════════════════════
 let swBendTool = 'fromax';
+let swMode = 'simple';
+let swLastSummary = null;
+
+function swUpdateSimpleCard(summary) {
+  const card = document.getElementById('sw-simple-card');
+  if (!card) return;
+  if (swMode !== 'simple' || !summary) {
+    card.classList.remove('visible');
+    return;
+  }
+  document.getElementById('swsc-cut').textContent = Math.round(summary.cut);
+  document.getElementById('swsc-m1').textContent = Math.round(summary.M1);
+  document.getElementById('swsc-m2').textContent = Math.round(summary.M2);
+  document.getElementById('swsc-m3').textContent = Math.round(summary.M3);
+  const note = document.getElementById('swsc-note');
+  if (note) {
+    if (!sessionStorage.getItem('sw_simple_tip')) {
+      note.textContent = 'Tips: märk alla tre böjarna från samma referensände innan du börjar bocka';
+      sessionStorage.setItem('sw_simple_tip', '1');
+    } else {
+      note.textContent = `Sidmått ${Math.round(summary.D)} mm · höjd ${Math.round(summary.H_total)} mm`;
+    }
+  }
+  card.classList.add('visible');
+}
+
+function swSetMode(mode) {
+  swMode = mode;
+  sessionStorage.setItem('sw_ui_mode', mode);
+  document.querySelectorAll('#swan-section .sw-advanced-only').forEach(el =>
+    el.classList.toggle('sw-hidden', mode === 'simple'));
+  document.querySelectorAll('#swan-section .sw-simple-only').forEach(el =>
+    el.classList.toggle('sw-hidden', mode === 'advanced'));
+  document.querySelectorAll('.swm-btn').forEach(btn =>
+    btn.classList.toggle('active', btn.dataset.swmode === mode));
+  swUpdateSimpleCard(swLastSummary);
+}
 
 function swSetPipeSize(size) {
   document.getElementById('sw-diam').value = size;
@@ -4686,6 +4763,8 @@ function swCalculate() {
   const sideRaw   = document.getElementById('sw-offset').value.trim();
   const heightRaw = document.getElementById('sw-height').value.trim();
   if (!sideRaw || !heightRaw) {
+    swLastSummary = null;
+    swUpdateSimpleCard(null);
     showSuggestion('sw-warning', 'Nästa steg:', [
       `${sideRaw   ? '✓' : '✗'} sidmått`,
       `${heightRaw ? '✓' : '✗'} total höjd`,
@@ -4742,6 +4821,8 @@ function swCalculate() {
 
   // 4b. Geometry feasibility
   if (vmid < 0) {
+    swLastSummary = null;
+    swUpdateSimpleCard(null);
     const minHeight = Math.ceil(2 * H1);
     const flatter = A > 30 ? 30 : 22.5;
     showSuggestion('sw-warning',
@@ -4800,6 +4881,8 @@ function swCalculate() {
   document.getElementById('sw-cut').textContent     = Math.round(cut);
   document.getElementById('sw-d-out').textContent   = Math.round(D);
   document.getElementById('sw-mid-out').textContent = Math.round(vmid);
+  swLastSummary = { cut, M1, M2, M3, D, H_total };
+  swUpdateSimpleCard(swLastSummary);
 
   // Reference strip
   const refStrip = document.getElementById('sw-ref-strip');
@@ -4998,6 +5081,42 @@ function swDrawDiagram(M1ref, L, vmid, rEnd, D, H1, A) {
 
 // ══ TAKOFFSET (AUTO CLEARANCE S-BEND) ════════════════════════════════════
 let toBendTool = 'fromax';
+let toMode = 'simple';
+let toLastSummary = null;
+
+function toUpdateSimpleCard(summary) {
+  const card = document.getElementById('to-simple-card');
+  if (!card) return;
+  if (toMode !== 'simple' || !summary) {
+    card.classList.remove('visible');
+    return;
+  }
+  document.getElementById('tosc-cut').textContent = Math.round(summary.cut);
+  document.getElementById('tosc-m1').textContent = Math.round(summary.M1);
+  document.getElementById('tosc-m2').textContent = Math.round(summary.M2);
+  const note = document.getElementById('tosc-note');
+  if (note) {
+    if (!sessionStorage.getItem('to_simple_tip')) {
+      note.textContent = 'Tips: kontrollera takavståndet först och märk sedan båda böjarna från samma referensände';
+      sessionStorage.setItem('to_simple_tip', '1');
+    } else {
+      note.textContent = `h1 ${Math.round(summary.h1)} mm → h2 ${Math.round(summary.h2)} mm`;
+    }
+  }
+  card.classList.add('visible');
+}
+
+function toSetMode(mode) {
+  toMode = mode;
+  sessionStorage.setItem('to_ui_mode', mode);
+  document.querySelectorAll('#takoffset-section .to-advanced-only').forEach(el =>
+    el.classList.toggle('to-hidden', mode === 'simple'));
+  document.querySelectorAll('#takoffset-section .to-simple-only').forEach(el =>
+    el.classList.toggle('to-hidden', mode === 'advanced'));
+  document.querySelectorAll('.tom-btn').forEach(btn =>
+    btn.classList.toggle('active', btn.dataset.tomode === mode));
+  toUpdateSimpleCard(toLastSummary);
+}
 
 function toSetPipeSize(size) {
   document.getElementById('to-diam').value = size;
@@ -5106,6 +5225,8 @@ function toCalculate() {
 
   // Fatal: D must be positive
   if (D <= 0) {
+    toLastSummary = null;
+    toUpdateSimpleCard(null);
     showSuggestion('to-warning',
       'Målhöjden måste vara högre än nuvarande höjd.',
       [
@@ -5118,6 +5239,8 @@ function toCalculate() {
 
   const geo = geParallelOffset(D, A);
   if (geo.L === Infinity) {
+    toLastSummary = null;
+    toUpdateSimpleCard(null);
     showSuggestion('to-warning', 'Vinkeln är ogiltig.', ['Välj en vinkel mellan 1° och 179°']);
     document.getElementById('takoffset-results').style.display = 'block';
     return;
@@ -5130,6 +5253,8 @@ function toCalculate() {
 
   const _bd = geBendDeduction({ angle_deg: A, tool: toBendTool, size, clr });
   if (_bd.model === 'invalid') {
+    toLastSummary = null;
+    toUpdateSimpleCard(null);
     showSuggestion('to-warning', 'Kontrollera böjinställningen.', ['Böjvinkel, rörstorlek och CLR måste vara ifyllda.']);
     document.getElementById('takoffset-results').style.display = 'block';
     return;
@@ -5186,6 +5311,8 @@ function toCalculate() {
   document.getElementById('to-D-out').textContent = String(Math.round(D));
   document.getElementById('to-L-out').textContent = String(Math.round(L));
   document.getElementById('to-H-out').textContent = String(Math.round(H));
+  toLastSummary = { cut: cutDisplay, M1, M2, h1, h2 };
+  toUpdateSimpleCard(toLastSummary);
   document.getElementById('to-note-h1').textContent = String(Math.round(h1));
   document.getElementById('to-note-h2').textContent = String(Math.round(h2));
 
@@ -5266,6 +5393,44 @@ function toCalculate() {
 }
 
 // ══ TAKRÖR 90° ═══════════════════════════════════════════════════════════
+let trMode = 'simple';
+let trLastSummary = null;
+
+function trUpdateSimpleCard(summary) {
+  const card = document.getElementById('tr-simple-card');
+  if (!card) return;
+  if (trMode !== 'simple' || !summary) {
+    card.classList.remove('visible');
+    return;
+  }
+  document.getElementById('trsc-cut').textContent = Math.round(summary.cut);
+  document.getElementById('trsc-m1').textContent = Math.round(summary.M1);
+  document.getElementById('trsc-m2').textContent = Math.round(summary.M2);
+  document.getElementById('trsc-m3').textContent = Math.round(summary.M3);
+  const note = document.getElementById('trsc-note');
+  if (note) {
+    if (!sessionStorage.getItem('tr_simple_tip')) {
+      note.textContent = 'Tips: märk M1, M2 och M3 från samma START-ände innan första böjen';
+      sessionStorage.setItem('tr_simple_tip', '1');
+    } else {
+      note.textContent = `S1 ${Math.round(summary.s1)} mm · S2 ${Math.round(summary.s2)} mm · S3 ${Math.round(summary.s3)} mm`;
+    }
+  }
+  card.classList.add('visible');
+}
+
+function trSetMode(mode) {
+  trMode = mode;
+  sessionStorage.setItem('tr_ui_mode', mode);
+  document.querySelectorAll('#takror-section .tr-advanced-only').forEach(el =>
+    el.classList.toggle('tr-hidden', mode === 'simple'));
+  document.querySelectorAll('#takror-section .tr-simple-only').forEach(el =>
+    el.classList.toggle('tr-hidden', mode === 'advanced'));
+  document.querySelectorAll('.trm-btn').forEach(btn =>
+    btn.classList.toggle('active', btn.dataset.trmode === mode));
+  trUpdateSimpleCard(trLastSummary);
+}
+
 function trSetPipeSize(size) {
   document.getElementById('tr-diam').value = size;
   [12, 15].forEach(s => {
@@ -5333,6 +5498,7 @@ function trCalculate(forceShow = false) {
   const cut = marks[marks.length - 1];
   const cutDisplay = Math.round(cut);
   const totalBd = bd * 3;
+  trLastSummary = { cut, M1, M2, M3, s1, s2, s3 };
 
   const pipeRadius = size / 2;
 
@@ -5394,6 +5560,7 @@ function trCalculate(forceShow = false) {
   document.getElementById('tr-cut').textContent      = String(cutDisplay);
   document.getElementById('tr-total-bd').textContent = `-${totalBd.toFixed(0)}`;
   document.getElementById('tr-results').style.display = 'block';
+  trUpdateSimpleCard(trLastSummary);
 
   let trBdBadgeHtml = `<span id="tr-bd-badge" class="result-badge result-badge-warn" data-estimated="false"></span>`;
   if (size === 15) {
@@ -6026,6 +6193,12 @@ window.onload = () => {
   mbSetMode(savedMbMode);
   const savedSbMode = sessionStorage.getItem('sb_ui_mode') || 'simple';
   sbSetMode(savedSbMode);
+  const savedSwMode = sessionStorage.getItem('sw_ui_mode') || 'simple';
+  swSetMode(savedSwMode);
+  const savedToMode = sessionStorage.getItem('to_ui_mode') || 'simple';
+  toSetMode(savedToMode);
+  const savedTrMode = sessionStorage.getItem('tr_ui_mode') || 'simple';
+  trSetMode(savedTrMode);
   toCheckFieldWarnings();
   trCheckFieldWarnings();
 
