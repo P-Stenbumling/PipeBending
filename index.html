@@ -1539,44 +1539,35 @@
         <span class="bd-label mb-advanced-only">mm</span>
       </div>
       <div class="mb-comp-box">
-        <div class="mb-comp-title">v0.5.8 - Fasten och montagejustering (valfritt)</div>
+        <div class="mb-comp-title">v0.5.8 - Förenklad montagekompensation</div>
         <div class="mb-comp-grid">
           <div class="field">
-            <label><input type="checkbox" id="mb-fixture-enabled"> Anvand fasten i berakning</label>
-            <div class="hint">Valbart: av = ingen fasten-korrigering</div>
+            <label><input type="checkbox" id="mb-use-clamp" checked> Använd fäste-kompensation</label>
+            <div class="hint">Default: på (väggrelation styr tecken)</div>
           </div>
           <div class="field">
-            <label for="mb-fixture-build">Fasten bygger ut</label>
+            <label for="mb-fixture-build">Fästen bygger ut</label>
             <input type="number" id="mb-fixture-build" value="20" min="0" step="1">
-            <div class="hint">mm fran vagg</div>
+            <div class="hint">mm från vägg</div>
           </div>
           <div class="field">
-            <label for="mb-end-instick">Instick start/slut</label>
+            <label><input type="checkbox" id="mb-use-instick" checked> Använd instick start/slut</label>
+            <div class="hint">Default: på</div>
+          </div>
+          <div class="field">
+            <label for="mb-end-instick">Instick (start/slut)</label>
             <input type="number" id="mb-end-instick" value="10" min="0" step="1">
-            <div class="hint">mm per ande</div>
-          </div>
-          <div class="field">
-            <label for="mb-middle-pattern">Mellanstrackor (auto)</label>
-            <select id="mb-middle-pattern">
-              <option value="none">Ingen autojustering</option>
-              <option value="negpos">S2 -x, S3 +x, S4 -x ...</option>
-              <option value="posneg">S2 +x, S3 -x, S4 +x ...</option>
-            </select>
-            <div class="hint">Valj monster efter hur matten ar tagna</div>
+            <div class="hint">mm per ände</div>
           </div>
         </div>
-        <div class="mb-comp-actions">
-          <button type="button" class="mb-add-btn" onclick="mbApplySnaplockPreset()">Applicera autojustering</button>
-          <button type="button" class="mb-add-btn" onclick="mbClearAdjustments()">Nollstall justeringar</button>
-        </div>
-        <div id="mb-comp-note" class="mb-comp-note">Mata in basmatt i strackfalten. Kolumnen "Justering" visar tillagg/avdrag som appen adderar innan markberakning.</div>
+        <div id="mb-comp-note" class="mb-comp-note">Auto: appen räknar justeringar från 20/10 direkt. Ingen manuell +/- krävs.</div>
       </div>
 
       <!-- Segments -->
       <div class="section-label">Sträckor &amp; riktningar</div>
       <div class="mb-segments-wrap">
         <div class="mb-seg-header">
-          <span>Stracka</span><span>Langd bas (mm)</span><span>Justering</span><span>Bojriktning (i fardriktning)</span><span></span>
+          <span>Stracka</span><span>Langd bas (mm)</span><span>Autojustering</span><span>Bojriktning (i fardriktning)</span><span></span>
         </div>
         <div id="mb-seg-list"></div>
       </div>
@@ -2737,46 +2728,47 @@ function mbGetEffectiveSegments() {
 }
 
 function mbGetFixtureConfig() {
-  const enabled = !!document.getElementById('mb-fixture-enabled')?.checked;
+  const useClamp = !!document.getElementById('mb-use-clamp')?.checked;
+  const useInstick = !!document.getElementById('mb-use-instick')?.checked;
   const build = parseFloat(document.getElementById('mb-fixture-build')?.value) || 0;
   const instick = parseFloat(document.getElementById('mb-end-instick')?.value) || 0;
-  const pattern = document.getElementById('mb-middle-pattern')?.value || 'none';
-  return { enabled, build, instick, pattern };
+  return { useClamp, useInstick, build, instick };
+}
+
+function mbRecomputeAdjustments() {
+  mbSyncAdjustmentsLength();
+  const { useClamp, useInstick, build, instick } = mbGetFixtureConfig();
+  const n = mbSegments.length;
+  mbAdjustments = mbSegments.map(() => 0);
+  if (!n) return;
+
+  // Start/end: insertion depth + wall relation offset.
+  if (useClamp) mbAdjustments[0] -= build;
+  if (useInstick) mbAdjustments[0] += instick;
+  if (n > 1) {
+    if (useClamp) mbAdjustments[n - 1] += build;
+    if (useInstick) mbAdjustments[n - 1] += instick;
+  }
+
+  // Middle segments: deterministic wall-based alternation (-,+,-,+ ...)
+  if (useClamp) {
+    for (let i = 1; i < n - 1; i++) {
+      mbAdjustments[i] = (i % 2 === 1) ? -build : build;
+    }
+  }
 }
 
 function mbUpdateCompNote() {
   const note = document.getElementById('mb-comp-note');
   if (!note) return;
-  const { enabled, build, instick, pattern } = mbGetFixtureConfig();
+  const { useClamp, useInstick, build, instick } = mbGetFixtureConfig();
   const adjTotal = mbAdjustments.reduce((s, v) => s + (parseFloat(v) || 0), 0);
-  const middleText =
-    pattern === 'negpos' ? 'S2 -x, S3 +x'
-    : pattern === 'posneg' ? 'S2 +x, S3 -x'
-    : 'ingen autojustering i mitten';
   note.textContent =
-    `Fasten: ${enabled ? 'PA' : 'AV'} | bygg = ${Math.round(build)} mm | instick ande = ${Math.round(instick)} mm | mitten = ${middleText} | total justering = ${adjTotal >= 0 ? '+' : ''}${Math.round(adjTotal)} mm`;
+    `Fäste-komp: ${useClamp ? 'PÅ' : 'AV'} | instick: ${useInstick ? 'PÅ' : 'AV'} | bygg = ${Math.round(build)} mm | instick ände = ${Math.round(instick)} mm | autojustering totalt = ${adjTotal >= 0 ? '+' : ''}${Math.round(adjTotal)} mm`;
 }
 
 function mbApplySnaplockPreset() {
-  mbSyncAdjustmentsLength();
-  const { enabled, build, instick, pattern } = mbGetFixtureConfig();
-  const n = mbSegments.length;
-  mbAdjustments = mbSegments.map(() => 0);
-  if (!n) return;
-
-  mbAdjustments[0] = (enabled ? -build : 0) + instick;
-  if (n > 1) mbAdjustments[n - 1] = (enabled ? build : 0) + instick;
-
-  if (enabled) {
-    for (let i = 1; i < n - 1; i++) {
-      if (pattern === 'negpos') {
-        mbAdjustments[i] = (i % 2 === 1) ? -build : build;
-      } else if (pattern === 'posneg') {
-        mbAdjustments[i] = (i % 2 === 1) ? build : -build;
-      }
-    }
-  }
-
+  mbRecomputeAdjustments();
   mbRenderSegments();
   mbUpdateCompNote();
 }
@@ -2788,12 +2780,19 @@ function mbClearAdjustments() {
 }
 
 function mbInitCompInputs() {
-  ['mb-fixture-enabled', 'mb-fixture-build', 'mb-end-instick', 'mb-middle-pattern'].forEach((id) => {
+  ['mb-use-clamp', 'mb-use-instick', 'mb-fixture-build', 'mb-end-instick'].forEach((id) => {
     const el = document.getElementById(id);
     if (!el) return;
-    el.addEventListener('input', mbUpdateCompNote);
-    el.addEventListener('change', mbUpdateCompNote);
+    const refresh = () => {
+      mbRecomputeAdjustments();
+      mbRenderSegments();
+      mbUpdateCompNote();
+      if (document.getElementById('mb-results')?.style.display === 'block') mbCalculate();
+    };
+    el.addEventListener('input', refresh);
+    el.addEventListener('change', refresh);
   });
+  mbRecomputeAdjustments();
   mbUpdateCompNote();
 }
 
@@ -2943,11 +2942,8 @@ function mbRenderSegments() {
     adjInp.className = 'mb-seg-adjust';
     adjInp.value = mbAdjustments[i] || 0;
     adjInp.step = 1;
-    adjInp.title = 'Justering i mm (laggs till pa baslangden)';
-    adjInp.addEventListener('input', () => {
-      mbAdjustments[i] = parseFloat(adjInp.value) || 0;
-      mbUpdateCompNote();
-    });
+    adjInp.title = 'Autojustering i mm (beräknas från montageinställningarna)';
+    adjInp.readOnly = true;
 
     const dirCell = document.createElement('div');
     if (!isLast) {
@@ -2977,6 +2973,7 @@ function mbRenderSegments() {
       mbAdjustments.splice(i, 1);
       if (!isLast) mbDirs.splice(i, 1);
       else if (mbDirs.length >= mbSegments.length) mbDirs.pop();
+      mbRecomputeAdjustments();
       mbRenderSegments();
       mbUpdateCompNote();
     });
@@ -2990,6 +2987,7 @@ function mbAddSegment() {
   mbSegments.push(300);
   mbAdjustments.push(0);
   mbDirs.push('L');
+  mbRecomputeAdjustments();
   mbRenderSegments();
   mbUpdateCompNote();
 }
@@ -3007,6 +3005,7 @@ function mbPresetUBend() {
     b.classList.toggle('active', b.textContent.includes('90'));
   });
 
+  mbRecomputeAdjustments();
   mbRenderSegments();
   mbUpdateCompNote();
   mbUpdateDeductBadge();
@@ -3033,6 +3032,7 @@ function mbComputeMarks(segs, bd) {
 
 function mbCalculate() {
   const bd      = mbGetBendDeduction();
+  mbRecomputeAdjustments();
   const effectiveSegments = mbGetEffectiveSegments();
   const nBends  = effectiveSegments.length - 1;
   const marks   = mbComputeMarks(effectiveSegments, bd);
