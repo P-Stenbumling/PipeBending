@@ -1343,6 +1343,7 @@
           <label for="h-rise-display">Stigning (H_rise)</label>
           <input type="number" id="h-rise-display" class="computed" readonly tabindex="-1" aria-label="Beräknad vertikal stigning B minus A">
           <div class="hint">B − (A + T-bygg) = stigning från grenrörets mun</div>
+          <div id="banana-height-compat" class="hint-warn banana-advanced-only"></div>
         </div>
       </div>
     </div>
@@ -3926,6 +3927,11 @@ function calculate(forceShow = false) {
 
   const hasHeights = !isNaN(hojdA) && !isNaN(hojdB) && !isNaN(tBygg) && hojdB > hojdA + tBygg;
   const H_rise     = hasHeights ? hojdB - (hojdA + tBygg) : NaN; // rise from T-branch face to H-stycke
+  const heightCompatEl = document.getElementById('banana-height-compat');
+  if (heightCompatEl) {
+    heightCompatEl.classList.remove('visible');
+    heightCompatEl.textContent = '';
+  }
 
   const M1         = m1val;
   const freeBefore = M1 - instB;   // free straight pipe from H face to bend mark
@@ -3966,6 +3972,17 @@ function calculate(forceShow = false) {
     alpha_rad = Math.atan(D / H_diag);
     alpha_deg = alpha_rad * 180 / Math.PI;
     L         = Math.sqrt(D*D + H_diag*H_diag);
+  }
+
+  if (heightCompatEl && calcMode === 'vinkel' && hasHeights) {
+    const riseNeeded = freeBefore + H_diag;
+    const deltaRise = H_rise - riseNeeded;
+    if (Math.abs(deltaRise) >= 2) {
+      const suggestedM1 = Math.max(1, Math.round(instB + Math.max(0, H_rise - H_diag)));
+      heightCompatEl.textContent =
+        `Måtten går inte ihop i vinkelläge: höjderna ger stigning ${Math.round(H_rise)}mm men vinkel ${Math.round(alpha_deg)}° + M1 ${Math.round(M1)}mm kräver ${Math.round(riseNeeded)}mm. Kapa räknas på vinkeln. Testa M1 ≈ ${suggestedM1}mm eller Fri-läge.`;
+      heightCompatEl.classList.add('visible');
+    }
   }
 
   const _bd = geBendDeduction({ angle_deg: alpha_deg, tool: bendTool, size: dia, clr });
