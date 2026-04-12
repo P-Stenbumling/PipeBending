@@ -689,6 +689,14 @@
   .mb-marks-table .mb-total-row td { border-top: 2px solid var(--border); color: var(--accent); font-weight: bold; padding-top: 10px; }
   .mb-row-p2 td { background: #090d14; }
   .mb-mark-global { display: block; font-size: 0.65rem; color: var(--text-dim); margin-top: 1px; }
+  .mb-practical-line { display: block; font-size: 0.66rem; color: var(--text-dim); margin-top: 3px; letter-spacing: 0.03em; }
+  .mb-practical-sub { display: block; font-size: 0.64rem; color: var(--text-dim); opacity: 0.9; margin-top: 1px; }
+  .mb-pri-badge, .mb-sec-badge {
+    display: inline-block; font-size: 0.56rem; font-weight: 700;
+    letter-spacing: 0.08em; padding: 1px 4px; border-radius: 3px; margin-right: 5px;
+  }
+  .mb-pri-badge { color: #000; background: var(--accent2); }
+  .mb-sec-badge { color: var(--accent); background: #1a1306; border: 1px solid #3a2808; }
   .mb-pjas-tag { font-size: 0.6rem; letter-spacing: 0.1em; padding: 1px 5px; border-radius: 2px; margin-right: 4px; vertical-align: middle; }
   .mb-pjas-1 { background: #0a1a10; color: #5fcf80; border: 1px solid #1a4025; }
   .mb-pjas-2 { background: #0a1020; color: #6ab0f0; border: 1px solid #1a3060; }
@@ -1598,6 +1606,7 @@
         <div class="mbsc-row"><span class="mbsc-label">Antal böjar</span><span class="mbsc-val" id="mbsc-bends">—</span><span class="mbsc-unit">st</span></div>
         <div class="mbsc-row"><span class="mbsc-label">Första märke från START</span><span class="mbsc-val" id="mbsc-first">—</span><span class="mbsc-unit">mm</span></div>
         <div id="mbsc-note" class="hint"></div>
+        <div id="mbsc-measure-hint" class="hint">Mät alltid från START — inte mellan märken.</div>
       </div>
 
       <!-- Hero: total length -->
@@ -2700,6 +2709,15 @@ let mbSegments = [1420, 1312, 405, 300];
 let mbDirs     = ['L', 'R', 'R'];  // length = mbSegments.length - 1
 let mbAdjustments = mbSegments.map(() => 0);
 let mbMode = 'simple';
+let mbMeasurementMode = 'practical';
+
+function mbFormatPracticalDistance(mm) {
+  const rounded = Math.round(mm);
+  const meters = (rounded / 1000).toFixed(2);
+  const base = Math.floor(rounded / 100) * 100;
+  const rest = rounded - base;
+  return { rounded, meters, base, rest };
+}
 
 function mbSyncAdjustmentsLength() {
   if (mbAdjustments.length < mbSegments.length) {
@@ -3159,10 +3177,24 @@ function mbCalculate() {
     const pjasTag  = !hasOv ? '' : onP2
       ? `<span class="mb-pjas-tag mb-pjas-2">PJÄS 2</span>`
       : `<span class="mb-pjas-tag mb-pjas-1">PJÄS 1</span>`;
+    const showPractical = mbMode === 'simple' && mbMeasurementMode === 'practical';
+    const distBetween = i > 0 ? marks[i] - marks[i - 1] : null;
+    let practicalBlock = '';
+    if (showPractical) {
+      const primaryVal = Math.round(marks[i]);
+      practicalBlock += `<span class="mb-practical-line"><span class="mb-pri-badge">PRIMARY</span>${primaryVal} mm från START</span>`;
+      if (i > 0 && distBetween !== null) {
+        const p = mbFormatPracticalDistance(distBetween);
+        practicalBlock += `<span class="mb-practical-line"><span class="mb-sec-badge">SECONDARY</span>Avstånd mellan märken (för kontroll): ${p.rounded} mm</span>`;
+        practicalBlock += `<span class="mb-practical-sub">≈ ${p.meters} m</span>`;
+        practicalBlock += `<span class="mb-practical-sub">≈ ${p.base} + ${p.rest} mm</span>`;
+      }
+    }
+
     const posCell  = onP2
       ? `<span class="mb-mark-pos">${Math.round(localPos)} mm</span>
-         <span class="mb-mark-global">(global ${Math.round(marks[i])} mm)</span>`
-      : `<span class="mb-mark-pos">${Math.round(marks[i])} mm</span>`;
+         <span class="mb-mark-global">(global ${Math.round(marks[i])} mm)</span>${practicalBlock}`
+      : `<span class="mb-mark-pos">${Math.round(marks[i])} mm</span>${practicalBlock}`;
 
     rows += `<tr class="${onP2 ? 'mb-row-p2' : ''}">
       <td>${pjasTag} ${i + 1}</td>
