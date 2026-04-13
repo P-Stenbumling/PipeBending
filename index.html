@@ -1461,7 +1461,7 @@
         <div class="hint">Från <strong>H-stycke-änden</strong> (överkant) [mm]</div>
         <button type="button" class="banana-mini-btn" onclick="bananaAutoFillM1()">Autofyll M1 från höjder</button>
         <div id="banana-m1-auto-hint" class="hint"></div>
-        <div id="banana-m1-hint" class="hint-danger"></div>
+        <div id="banana-m1-hint" class="hint-warn"></div>
       </div>
       <div class="field">
         <label for="instickA">Instick A <span>(T-koppling)</span></label>
@@ -1509,7 +1509,7 @@
 
     <div class="action-required-header" id="banana-action-header"></div>
     <div class="ref-strip" id="banana-ref-strip-result"></div>
-    <div id="banana-clamp-lead-result" class="hint-danger"></div>
+    <div id="banana-clamp-lead-result" class="hint-warn"></div>
 
     <!-- KAPA hero card -->
     <div class="kapa-card" id="kapa-card">
@@ -4079,13 +4079,13 @@ function bananaClampCheck() {
   const M1    = parseFloat(document.getElementById('m1val').value) || 0;
   const instB = parseFloat(document.getElementById('instickB').value) || 0;
   const dia   = parseFloat(document.getElementById('diam').value) || 12;
+  const minRequired = bendTool === 'fromax' ? 40 : (2 * dia);
   const hintEl = document.getElementById('banana-m1-hint');
   if (!hintEl) return;
   const freeBefore = M1 - instB;
   if (freeBefore > 0) {
-    const clamp = geCheckClampLength(freeBefore, dia);
-    if (!clamp.ok) {
-      hintEl.textContent = `Bocken slinter om du kapar först — röret är bara ${freeBefore}mm framför M1 (minst ${clamp.minRequired}mm krävs). Lösning: bocka först på hel längd, kapa sen.`;
+    if (freeBefore < minRequired) {
+      hintEl.textContent = `Arbetsflöde: bocka först. M1 är ${Math.round(M1)}mm från H-änden men verktyget kräver minst ${Math.round(minRequired)}mm före M1 om du kapar först. Kaplängd gäller efter böjning.`;
       hintEl.classList.add('visible');
       return;
     }
@@ -4278,9 +4278,14 @@ function calculate(forceShow = false) {
       document.getElementById('bsc-angle').textContent = Math.round(alpha_deg);
       const bscNote = document.getElementById('bsc-note');
       if (bscNote) {
-        bscNote.textContent = autoM1Applied
-          ? 'M1 justerades från höjderna för att matcha vald vinkel. Mät alltid från H-stycket.'
-          : 'Mät alltid M1 från H-stycket - inte från T-kopplingen.';
+        const clampMin = bendTool === 'fromax' ? 40 : (2 * dia);
+        if (freeBefore > 0 && freeBefore < clampMin) {
+          bscNote.textContent = `Bocka på full längd först. Kapa till ${Math.round(kapa)} mm efter böjning.`;
+        } else {
+          bscNote.textContent = autoM1Applied
+            ? 'M1 justerades från höjderna för att matcha vald vinkel. Mät alltid från H-stycket.'
+            : 'Mät alltid M1 från H-stycket - inte från T-kopplingen.';
+        }
         if (!sessionStorage.getItem('banana_simple_tip')) sessionStorage.setItem('banana_simple_tip', '1');
       }
       simpleCard.classList.add('visible');
@@ -4294,9 +4299,9 @@ function calculate(forceShow = false) {
   const clampLeadEl = document.getElementById('banana-clamp-lead-result');
   if (clampLeadEl) {
     if (freeBefore > 0) {
-      const clampLead = geCheckClampLength(freeBefore, dia);
-      if (!clampLead.ok) {
-        clampLeadEl.textContent = `Bocken slinter om du kapar först — röret är bara ${freeBefore}mm framför M1 (minst ${clampLead.minRequired}mm krävs). Bocka först på hel längd och kapa efter böj.`;
+      const clampMin = bendTool === 'fromax' ? 40 : (2 * dia);
+      if (freeBefore < clampMin) {
+        clampLeadEl.textContent = `Arbetsflöde valt: bocka först, kapa sen. M1=${Math.round(M1)}mm och greppkrav är minst ${Math.round(clampMin)}mm före M1 om du kapar först. Kapa till ${Math.round(kapa)}mm först efter böjning.`;
         clampLeadEl.classList.add('visible');
       } else {
         clampLeadEl.classList.remove('visible');
