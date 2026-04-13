@@ -4470,7 +4470,11 @@ function calculate(forceShow = false) {
     heightCompatEl.textContent = '';
   }
 
+  const enteredM1 = m1val;
   let M1 = m1val;
+  // In angle mode with fixed heights, low M1 must be resolved by angle fit, not display-only shifting.
+  const shouldForcePracticalM1ForAngle = calcMode === 'vinkel' && hasHeights && M1 < M1_MIN;
+  if (shouldForcePracticalM1ForAngle) M1 = M1_MIN;
   let freeBefore = M1 - instB;   // free straight pipe from H face to bend mark
   let autoM1Applied = false;
   const offsetLockActive = bananaHMode || bananaM1ManualOverride || M1 < M1_MIN;
@@ -4487,7 +4491,8 @@ function calculate(forceShow = false) {
       return;
     }
     if (isNaN(D) || D <= 0) return;
-    const shouldAdjustAngleFromM1 = hasHeights && (bananaM1ManualOverride || bananaHMode);
+    // Fixed heights are hard constraints in vinkel-läge: fit angle to geometry/M1 instead of locking angle.
+    const shouldAdjustAngleFromM1 = hasHeights;
     if (shouldAdjustAngleFromM1) {
       const riseOfDiagRaw = H_rise - freeBefore;
       const riseOfDiag = riseOfDiagRaw > 0 ? riseOfDiagRaw : 0.1;
@@ -4536,7 +4541,10 @@ function calculate(forceShow = false) {
       const transitionText = originalLockedAngle !== null
         ? `${fmt(originalLockedAngle,1)}° → ${fmt(alpha_deg,1)}°`
         : `${fmt(alpha_deg,1)}°`;
-      heightCompatEl.textContent = `Vinkel justerad till ${fmt(alpha_deg,1)}° för att passa M1 = ${Math.round(M1)} mm (${transitionText}).`;
+      const m1Info = shouldForcePracticalM1ForAngle && enteredM1 < M1_MIN
+        ? `${Math.round(enteredM1)} → ${Math.round(M1)} mm`
+        : `${Math.round(M1)} mm`;
+      heightCompatEl.textContent = `Vinkel justerad till ${fmt(alpha_deg,1)}° för att passa M1 = ${m1Info} (${transitionText}).`;
       heightCompatEl.classList.add('visible');
     }
 
