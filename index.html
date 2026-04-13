@@ -1331,6 +1331,9 @@
   .m1p-hmode-result .m1p-adj-val { color: #5fcf80; }
   .m1p-apply-btn { display: block; margin-top: 10px; width: 100%; background: #1e3a1c; color: #5fcf80; border: 1px solid #3a7040; border-radius: 4px; padding: 8px 14px; font-size: 12px; font-weight: 600; cursor: pointer; letter-spacing: 0.02em; transition: all .15s; }
   .m1p-apply-btn:hover { background: #254a22; color: #7fef9f; border-color: #5fcf80; }
+  .m1p-secondary-block { background: #080e08; border: 1px solid #182018; border-radius: 4px; padding: 9px 12px; margin-top: 6px; opacity: 0.65; }
+  .m1p-secondary-label { font-size: 10px; color: #4a5a45; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+  .m1p-secondary-row { display: flex; gap: 18px; font-size: 12px; color: #6a7a65; font-family: monospace; margin-bottom: 4px; }
 
 </style>
 </head>
@@ -4246,13 +4249,13 @@ function bananaM1PracticalCheck(M1, kapa, alpha_deg, instB) {
   const { strategy, hMode } = m1PracticalState;
 
   const sevLabel = isCritical
-    ? `M1 = ${Math.round(M1)} mm — kritiskt nära kaplinjen`
-    : `M1 = ${Math.round(M1)} mm — under rekommenderat minimum (${M1_MIN} mm)`;
+    ? `Matematiskt M1 = ${Math.round(M1)} mm — justerat till ${M1_MIN} mm i resultat`
+    : `Matematiskt M1 = ${Math.round(M1)} mm — justerat till ${M1_MIN} mm i resultat`;
 
-  // ── Strategy A quick fix — always visible (both modes) ───────────────
+  // ── Primary block (auto-applied) ─────────────────────────────────────
   const quickFix = `
     <div class="m1p-suggestion">
-      <div class="m1p-suggestion-label">Rekommendation — flytta böjpunkten ${shortfall} mm:</div>
+      <div class="m1p-suggestion-label">Rekommenderad lösning (lätt att utföra) — visas i resultat</div>
       <div class="m1p-adj-row">
         <span class="m1p-adj-label">M1</span>
         <span class="m1p-adj-val">${M1_MIN} mm</span>
@@ -4263,8 +4266,14 @@ function bananaM1PracticalCheck(M1, kapa, alpha_deg, instB) {
         <span class="m1p-adj-val">${adjKapaA} mm</span>
         <span class="m1p-adj-note">+${shortfall} mm</span>
       </div>
-      <p class="m1p-note">Böjvinkel och H-stigning oförändrade. Röret kapas ${shortfall} mm längre.</p>
-      <button type="button" class="m1p-apply-btn" onclick="m1PracticalApply()">Tillämpa — sätt M1 = ${M1_MIN} mm och beräkna om</button>
+    </div>
+    <div class="m1p-secondary-block">
+      <div class="m1p-secondary-label">Matematisk lösning (svår att utföra)</div>
+      <div class="m1p-secondary-row">
+        <span>M1 = ${Math.round(M1)} mm</span>
+        <span>Kaplängd = ${Math.round(kapa)} mm</span>
+      </div>
+      <p class="m1p-note">Det finns tillräcklig längd i röret, men verktyget får sämre grepp vilket gör bockningen svår att utföra exakt.</p>
     </div>`;
 
   // ── H-connection mode — always visible (both modes) ──────────────────
@@ -4473,18 +4482,29 @@ function calculate(forceShow = false) {
   // ONE BEND formula: kapa = M1 + L + instA − bend_deduction  (M1 measured from H-stycke end)
   const kapa = M1 + L + instA - bendDeduction;
 
+  // ── Practical M1 adjustment (display layer — geometry unchanged) ──────
+  const rawM1    = M1;
+  const rawKapa  = kapa;
+  const adjDelta = rawM1 < M1_MIN ? (M1_MIN - rawM1) : 0;
+  const dispM1   = rawM1 < M1_MIN ? M1_MIN : rawM1;
+  const dispKapa = rawM1 < M1_MIN ? kapa + adjDelta : kapa;
+
   // ── Update cards ─────────────────────────────────────────────────────
   document.getElementById('r-angle').textContent = Math.round(alpha_deg) + '°';
   document.getElementById('r-slant').textContent = Math.round(L);
-  document.getElementById('r-m1').textContent    = Math.round(M1);
+  document.getElementById('r-m1').textContent    = Math.round(dispM1);
   document.getElementById('r-h').textContent     = Math.round(H_diag);
 
-  const rawLen = M1 + L + instA;
-  document.getElementById('kapa-value').textContent = Math.round(kapa);
-  document.getElementById('kd-raw').textContent    = Math.round(rawLen) + ' mm';
+  const dispRawLen = dispM1 + L + instA;
+  document.getElementById('kapa-value').textContent = Math.round(dispKapa);
+  document.getElementById('kd-raw').textContent    = Math.round(dispRawLen) + ' mm';
   document.getElementById('kd-deduct').textContent = '−' + Math.round(bendDeduction) + ' mm';
-  document.getElementById('kd-total').textContent  = Math.round(kapa) + ' mm';
+  document.getElementById('kd-total').textContent  = Math.round(dispKapa) + ' mm';
   document.getElementById('kapa-card').classList.add('visible');
+  const kapaSubLabel = document.getElementById('banana-kapa-sublabel');
+  if (kapaSubLabel) kapaSubLabel.textContent = adjDelta > 0
+    ? `Justerat +${adjDelta}mm (M1 ${Math.round(rawM1)}→${dispM1}mm) · Kapa efter bockning`
+    : 'Kapa här efter bockning (slutlängd)';
 
   // ── Formula steps ─────────────────────────────────────────────────────
   if (calcMode === 'vinkel') {
@@ -4519,8 +4539,8 @@ function calculate(forceShow = false) {
     ? (_wH > _wT ? 'bort från vägg (H-stycke längre ut)' : 'mot vägg (H-stycke närmre)')
     : 'se diagram';
   const steps = [
-    `Kapa röret till <em>${Math.round(kapa)} mm</em>`,
-    `Märk M1 = <em>${Math.round(M1)} mm</em> från överkant (H-stycke-sidan)`,
+    `Kapa röret till <em>${Math.round(dispKapa)} mm</em>`,
+    `Märk M1 = <em>${Math.round(dispM1)} mm</em> från överkant (H-stycke-sidan)`,
     `Böjriktning: <em>${bendDirText}</em>`,
     `Böj till <em>${springbackAngle}°</em> vid M1 — fjädring ger ~${fmt(alpha_deg,1)}° efter release`,
     `Stick in <em>${Math.round(instA)} mm</em> i T-koppling och <em>${Math.round(instB)} mm</em> i H-stycke`,
@@ -4534,9 +4554,9 @@ function calculate(forceShow = false) {
   const bdLabel = _bd.model === 'empirical' ? 'Böjkorrigering (empiriskt 90°)' : `Böjkorrigering (CLR=${Math.round(clr)})`;
   const bdBadgeHtml = `<span id="banana-bd-badge" class="result-badge result-badge-warn" data-estimated="false"></span>`;
   let rows = '';
-  rows += `<tr><td>Rör att kapa</td><td>${Math.round(kapa)} mm</td><td>Rörkniv/kapmaskin</td></tr>`;
+  rows += `<tr><td>Rör att kapa</td><td>${Math.round(dispKapa)} mm</td><td>Rörkniv/kapmaskin</td></tr>`;
   rows += `<tr><td>${bdLabel}</td><td>−${Math.round(bendDeduction)} mm ${bdBadgeHtml}</td><td>Ingår i kapa</td></tr>`;
-  rows += `<tr><td>M1 — Bockningsmärke</td><td>${Math.round(M1)} mm</td><td>Böj till ${springbackAngle}° (fjädring +${springback}°) — mäts från framtida kaplinje</td></tr>`;
+  rows += `<tr><td>M1 — Bockningsmärke</td><td>${Math.round(dispM1)} mm${adjDelta > 0 ? ` <span style="color:#6a7a65;font-size:10px">(mat. ${Math.round(rawM1)}mm)</span>` : ''}</td><td>Böj till ${springbackAngle}° (fjädring +${springback}°) — mäts från framtida kaplinje</td></tr>`;
   rows += `<tr><td>Instick A (T-koppling)</td><td>${Math.round(instA)} mm</td><td>Underkant in i T-koppling (diagonalt)</td></tr>`;
   rows += `<tr><td>Instick B (H-stycke)</td><td>${Math.round(instB)} mm</td><td>Överkant in i H-stycke (rakt)</td></tr>`;
   rows += `<tr><td>T-koppling bygger</td><td>${Math.round(tBygg)} mm</td><td>Stam cc → grenrörets mun (ingår i beräkning)</td></tr>`;
@@ -4545,14 +4565,16 @@ function calculate(forceShow = false) {
   const simpleCard = document.getElementById('banana-simple-card');
   if (simpleCard) {
     if (bananaMode === 'simple') {
-      document.getElementById('bsc-kapa').textContent  = Math.round(kapa);
-      document.getElementById('bsc-m1').textContent    = Math.round(M1);
+      document.getElementById('bsc-kapa').textContent  = Math.round(dispKapa);
+      document.getElementById('bsc-m1').textContent    = Math.round(dispM1);
       document.getElementById('bsc-angle').textContent = Math.round(alpha_deg);
       const bscNote = document.getElementById('bsc-note');
       if (bscNote) {
-        const workflowDecision = bananaWorkflowDecision(M1, kapa, bendTool);
-        if (!workflowDecision.canCutFirst) {
-          bscNote.textContent = `Bocka först på full längd. Placera M1 (${Math.round(M1)} mm) från framtida kaplinje. Kapa till ${Math.round(kapa)} mm efter bockning. M1 ligger nära slutet, men eftersom röret inte kapas före bockning finns alltid tillräcklig längd för verktyget.`;
+        const workflowDecision = bananaWorkflowDecision(rawM1, rawKapa, bendTool);
+        if (adjDelta > 0) {
+          bscNote.textContent = `M1 justerat till ${dispM1} mm (+${adjDelta} mm) för praktisk hantbarhet. Bocka på full längd — kapa till ${Math.round(dispKapa)} mm efter bockning. Det finns tillräcklig längd i röret, men verktyget får sämre grepp vid det matematiska M1-värdet (${Math.round(rawM1)} mm) vilket gör bockningen svår att utföra exakt.`;
+        } else if (!workflowDecision.canCutFirst) {
+          bscNote.textContent = `Bocka först på full längd. Placera M1 (${Math.round(dispM1)} mm) från framtida kaplinje. Kapa till ${Math.round(dispKapa)} mm efter bockning.`;
         } else {
           bscNote.textContent = autoM1Applied
             ? 'M1 justerades från höjderna för att matcha vald vinkel. Mät alltid från framtida kaplinje.'
@@ -4595,7 +4617,7 @@ function calculate(forceShow = false) {
   // Ref-strip result
   const refStripResult = document.getElementById('banana-ref-strip-result');
   if (refStripResult) {
-    refStripResult.innerHTML = `<strong>CUT (0 mm)</strong> ── ${Math.round(M1)} mm ── <strong>M1</strong>`;
+    refStripResult.innerHTML = `<strong>CUT (0 mm)</strong> ── ${Math.round(dispM1)} mm ── <strong>M1</strong>`;
   }
 
   // Suspicious M1
@@ -4627,7 +4649,7 @@ function calculate(forceShow = false) {
   drawDiagram(D, H_diag, L, alpha_deg, M1, dia, hojdA, hojdB, instA, instB, tBygg, wallT, wallH);
 
   // ── M1 practical constraint check ────────────────────────────────────
-  bananaM1PracticalCheck(M1, kapa, alpha_deg, instB);
+  bananaM1PracticalCheck(rawM1, rawKapa, alpha_deg, instB);
 
   // ── Stage 6: warning hierarchy (LAST) ────────────────────────────────
   applyWarningHierarchy(document.getElementById('results'));
