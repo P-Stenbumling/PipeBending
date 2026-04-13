@@ -1554,7 +1554,7 @@
     <div class="error-msg" id="error-msg"></div>
 
     <div id="banana-simple-card" class="banana-simple-card banana-simple-only">
-      <div class="bsc-row"><span class="bsc-label">Kapa röret till</span><span class="bsc-val" id="bsc-kapa">—</span><span class="bsc-unit">mm</span></div>
+      <div class="bsc-row"><span class="bsc-label">Markera framtida CUT vid</span><span class="bsc-val" id="bsc-kapa">—</span><span class="bsc-unit">mm</span></div>
       <div class="bsc-row"><span class="bsc-label">Bockningsmärke (M1) från CUT</span><span class="bsc-val" id="bsc-m1">—</span><span class="bsc-unit">mm</span></div>
       <div class="bsc-row bsc-angle"><span class="bsc-label">Böj till</span><span class="bsc-val" id="bsc-angle">—</span><span class="bsc-unit">grader</span></div>
       <div id="bsc-note" class="hint"></div>
@@ -1566,10 +1566,10 @@
 
     <!-- KAPA hero card -->
     <div class="kapa-card" id="kapa-card">
-      <div class="kapa-label">// Kapa röret till</div>
+      <div class="kapa-label">// Framtida CUT / slutlängd</div>
       <div class="kapa-value" id="kapa-value">—</div>
       <div class="kapa-unit">mm</div>
-      <div id="banana-kapa-sublabel" class="hint">Kapa här efter bockning (slutlängd)</div>
+      <div id="banana-kapa-sublabel" class="hint">Markera denna kaplinje först. Kapa här efter bockning.</div>
       <div class="kapa-breakdown">
         <div class="kapa-row">
           <span class="kd-label">Rå längd (M1 + L + instA)</span>
@@ -4603,10 +4603,10 @@ function calculate(forceShow = false) {
     ? (_wH > _wT ? 'bort från vägg (H-stycke längre ut)' : 'mot vägg (H-stycke närmre)')
     : 'se diagram';
   const steps = [
-    `<strong>Steg 1 – Märk upp röret</strong><br>CUT = <em>${Math.round(dispKapa)} mm</em>.<br>Bockningsmärke (M1) = <em>${Math.round(dispM1)} mm</em> från CUT. Bockningsmärket visar var böjen startar.`,
+    `<strong>Steg 1 – Märk upp röret</strong><br>Markera först <em>CUT = ${Math.round(dispKapa)} mm</em> på fullängdsröret.<br>Mät sedan bockningsmärke (M1) <em>${Math.round(dispM1)} mm</em> från CUT.`,
     `<strong>Steg 2 – Placera i bocknyckeln</strong><br>Lägg bockningsmärket på <em>0-mark</em>.<br>Lång sida vänster, kort sida höger.<br>Lite rör före märket ger bättre grepp.`,
     `<strong>Steg 3 – Bocka</strong><br>Bocka till <em>${springbackAngle}°</em>.<br>Efter fjädring landar röret på cirka <em>${fmt(alpha_deg,1)}°</em>.`,
-    `<strong>Steg 4 – Kapa</strong><br>Kapa röret till <em>${Math.round(dispKapa)} mm</em>.`,
+    `<strong>Steg 4 – Kapa</strong><br>Kapa vid den markerade CUT-linjen till <em>${Math.round(dispKapa)} mm</em>.`,
   ];
 
   document.getElementById('workflow-steps').innerHTML = steps.map((s, i) =>
@@ -4635,9 +4635,9 @@ function calculate(forceShow = false) {
       if (bscNote) {
         const workflowDecision = bananaWorkflowDecision(rawM1, rawKapa, bendTool);
         if (adjDelta > 0) {
-          bscNote.textContent = `Märk bockningsmärket ${dispM1} mm från CUT. Lägg märket på 0-strecket, bocka först och kapa sedan till ${Math.round(dispKapa)} mm. Det matematiska märket (${Math.round(rawM1)} mm) ger sämre grepp i verktyget.`;
+          bscNote.textContent = `Markera först CUT vid ${Math.round(dispKapa)} mm. Mät sedan bockningsmärket ${dispM1} mm från CUT. Lägg märket på 0-strecket, bocka först och kapa sist vid CUT. Det matematiska märket (${Math.round(rawM1)} mm) ger sämre grepp i verktyget.`;
         } else if (!workflowDecision.canCutFirst) {
-          bscNote.textContent = `Märk bockningsmärket ${Math.round(dispM1)} mm från CUT. Lägg märket på 0-strecket, bocka och kapa sedan till ${Math.round(dispKapa)} mm.`;
+          bscNote.textContent = `Markera först CUT vid ${Math.round(dispKapa)} mm. Mät sedan bockningsmärket ${Math.round(dispM1)} mm från CUT. Lägg märket på 0-strecket, bocka och kapa sist vid CUT.`;
         } else {
           bscNote.textContent = autoM1Applied
             ? 'Bockningsmärket uppdaterades från höjderna. Mät alltid från framtida kaplinje.'
