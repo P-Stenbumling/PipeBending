@@ -1296,8 +1296,19 @@
   .fg-mode-btn.active { border-color: var(--accent2); color: var(--accent2); background: #0d1a10; }
 
   /* ── M1 Practical Constraint Layer ───────────────────────────────────── */
-  .banana-m1-practical-wrap { display: none; margin-top: 14px; border-radius: 6px; overflow: hidden; border: 1px solid #2a3a28; }
+  .banana-m1-practical-wrap { display: none; margin: 8px 0 0; border-radius: 6px; overflow: hidden; border: 1px solid #2a3a28; }
   .banana-m1-practical-wrap.visible { display: block; }
+  .m1p-compact-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 14px; }
+  .m1p-compact-bar.m1p-warn   { background: rgba(230,160,30,.1); border-left: 4px solid #e8a020; }
+  .m1p-compact-bar.m1p-danger { background: rgba(220,60,50,.1);  border-left: 4px solid #e55a55; }
+  .m1p-compact-bar.m1p-info   { background: rgba(95,207,128,.08); border-left: 4px solid #5fcf80; }
+  .m1p-compact-text { font-size: 12px; font-weight: 600; flex: 1; }
+  .m1p-compact-bar.m1p-warn   .m1p-compact-text { color: #e8a020; }
+  .m1p-compact-bar.m1p-danger .m1p-compact-text { color: #e55a55; }
+  .m1p-compact-bar.m1p-info   .m1p-compact-text { color: #5fcf80; }
+  .m1p-detail-toggle { background: none; border: 1px solid #3a4a38; border-radius: 3px; color: #7a9a70; font-size: 11px; padding: 3px 8px; cursor: pointer; white-space: nowrap; flex-shrink: 0; transition: all .15s; }
+  .m1p-detail-toggle:hover { border-color: #5a7a55; color: #9aba90; }
+  .m1p-detail-panel { border-top: 1px solid #1e2e1c; }
   .m1p-header { padding: 10px 14px; font-size: 12px; font-weight: 600; letter-spacing: 0.02em; }
   .m1p-header.m1p-warn   { background: rgba(230,160,30,.12); color: #e8a020; border-left: 4px solid #e8a020; }
   .m1p-header.m1p-danger { background: rgba(220,60,50,.12);  color: #e55a55; border-left: 4px solid #e55a55; }
@@ -1534,6 +1545,9 @@
 
   </div>
 
+  <!-- M1 practical warning — shown between button and results when M1 < M1_MIN -->
+  <div id="banana-m1-practical" class="banana-m1-practical-wrap"></div>
+
   <!-- RESULTS -->
   <div class="results" id="results">
 
@@ -1550,7 +1564,6 @@
     <div class="action-required-header" id="banana-action-header"></div>
     <div class="ref-strip" id="banana-ref-strip-result"></div>
     <div id="banana-clamp-lead-result" class="hint-warn"></div>
-    <div id="banana-m1-practical" class="banana-m1-practical-wrap"></div>
 
     <!-- KAPA hero card -->
     <div class="kapa-card" id="kapa-card">
@@ -2724,12 +2737,15 @@ let estimatedUseCount = 0;
 const M1_MIN  = 40; // recommended minimum free pipe before bend mark (mm) — Fromax clamping
 const M1_WARN = 30; // warning threshold below which accuracy is compromised
 
+let bananaHMode = false; // H-styckeläge: locks M1 = M1_MIN regardless of calculation
+
 let m1PracticalState = {
   M1: null, kapa: null, alpha: null, instB: null,
   strategy: 'A',
   userM1: null,
   lastCalcM1: null,
   hMode: false,
+  detailOpen: false,
 };
 
 function applyWarningHierarchy(tabResultZoneEl) {
@@ -4077,6 +4093,7 @@ function updateHFromAngle() {
 
 function setBananaMode(mode) {
   bananaMode = mode;
+  if (mode === 'advanced') bananaHMode = false;
   sessionStorage.setItem('banana_ui_mode', mode);
   document.querySelectorAll('#banana-section .banana-advanced-only').forEach(el =>
     el.classList.toggle('banana-hidden', mode === 'simple'));
@@ -4161,6 +4178,11 @@ function bananaClampCheck() {
   const hintEl = document.getElementById('banana-m1-hint');
   if (!hintEl) return;
   hintEl.classList.remove('visible');
+  // Manual M1 edit disables H-styckeläge lock
+  if (bananaHMode) {
+    bananaHMode = false;
+    m1PracticalState.hMode = false;
+  }
 }
 
 function m1PracticalRenderStrategy() {
@@ -4224,11 +4246,14 @@ function bananaM1PracticalCheck(M1, kapa, alpha_deg, instB) {
   const el = document.getElementById('banana-m1-practical');
   if (!el) return;
 
-  // Reset state when the calculated M1 changes
+  // Sync hMode from global bananaHMode
+  m1PracticalState.hMode = bananaHMode;
+
+  // Reset transient state when the calculated M1 changes
   if (m1PracticalState.lastCalcM1 !== Math.round(M1)) {
     m1PracticalState.userM1     = M1_MIN;
-    m1PracticalState.lastCalcM1 = Math.round(M1);
-    m1PracticalState.hMode      = false;
+    m1PracticalState.lastCalcM1  = Math.round(M1);
+    m1PracticalState.detailOpen  = false;
   }
 
   m1PracticalState.M1    = M1;
@@ -4236,9 +4261,26 @@ function bananaM1PracticalCheck(M1, kapa, alpha_deg, instB) {
   m1PracticalState.alpha = alpha_deg;
   m1PracticalState.instB = instB;
 
-  if (M1 >= M1_MIN) {
+  // Show block when H-mode is active OR when M1 is below threshold
+  if (M1 >= M1_MIN && !bananaHMode) {
     el.innerHTML = '';
     el.classList.remove('visible');
+    return;
+  }
+
+  // H-mode active but M1 is already >= M1_MIN — show info-only state
+  if (M1 >= M1_MIN && bananaHMode) {
+    el.classList.add('visible');
+    el.innerHTML = `
+      <div class="m1p-compact-bar m1p-info">
+        <span class="m1p-compact-text">✓ H-styckeläge aktivt — M1 låst till ${M1_MIN} mm (beräknat ${Math.round(M1)} mm)</span>
+        <button type="button" class="m1p-hmode-btn active" onclick="m1PracticalToggleHMode()" style="margin-left:auto">Avaktivera</button>
+      </div>`;
+    // re-apply visibility classes
+    document.querySelectorAll('#banana-section .banana-advanced-only').forEach(el2 =>
+      el2.classList.toggle('banana-hidden', bananaMode === 'simple'));
+    document.querySelectorAll('#banana-section .banana-simple-only').forEach(el2 =>
+      el2.classList.toggle('banana-hidden', bananaMode === 'advanced'));
     return;
   }
 
@@ -4248,11 +4290,12 @@ function bananaM1PracticalCheck(M1, kapa, alpha_deg, instB) {
   const adjKapaA   = Math.round(kapa + shortfall);
   const { strategy, hMode } = m1PracticalState;
 
-  const sevLabel = isCritical
-    ? `Matematiskt M1 = ${Math.round(M1)} mm — justerat till ${M1_MIN} mm i resultat`
-    : `Matematiskt M1 = ${Math.round(M1)} mm — justerat till ${M1_MIN} mm i resultat`;
+  const compactText = `⚠ M1 = ${Math.round(M1)} mm → justerat till ${M1_MIN} mm (+${shortfall} mm kaplängd)`;
+  const { detailOpen } = m1PracticalState;
+  const detailDisplay  = detailOpen ? 'block' : 'none';
+  const toggleLabel    = detailOpen ? 'Dölj detaljer ▲' : 'Visa detaljer ▼';
 
-  // ── Primary block (auto-applied) ─────────────────────────────────────
+  // ── Detail panel content ──────────────────────────────────────────────
   const quickFix = `
     <div class="m1p-suggestion">
       <div class="m1p-suggestion-label">Rekommenderad lösning (lätt att utföra) — visas i resultat</div>
@@ -4313,12 +4356,16 @@ function bananaM1PracticalCheck(M1, kapa, alpha_deg, instB) {
     </div>`;
 
   el.innerHTML = `
-    <div class="m1p-header ${sevClass}">⚠ ${sevLabel}</div>
-    <div class="m1p-body">
-      <p>Fromax-klonen behöver stabilt rör att greppa vid böjpunkten. Beräkningen är matematiskt korrekt men ${isCritical ? 'kan vara svår att utföra noggrant' : 'riskerar dålig precision'} vid detta M1-värde.</p>
-      ${quickFix}
-      ${hmodeSection}
-      ${advancedExtra}
+    <div class="m1p-compact-bar ${sevClass}">
+      <span class="m1p-compact-text">${compactText}</span>
+      <button type="button" class="m1p-detail-toggle" id="m1p-detail-toggle-btn" onclick="m1PracticalToggleDetail()">${toggleLabel}</button>
+    </div>
+    <div class="m1p-detail-panel" id="m1p-detail-panel" style="display:${detailDisplay}">
+      <div class="m1p-body">
+        ${quickFix}
+        ${hmodeSection}
+        ${advancedExtra}
+      </div>
     </div>`;
 
   // Re-apply mode visibility for injected nodes
@@ -4330,14 +4377,18 @@ function bananaM1PracticalCheck(M1, kapa, alpha_deg, instB) {
   el.classList.add('visible');
 }
 
+function m1PracticalToggleDetail() {
+  m1PracticalState.detailOpen = !m1PracticalState.detailOpen;
+  const panel = document.getElementById('m1p-detail-panel');
+  const btn   = document.getElementById('m1p-detail-toggle-btn');
+  if (panel) panel.style.display = m1PracticalState.detailOpen ? 'block' : 'none';
+  if (btn)   btn.textContent = m1PracticalState.detailOpen ? 'Dölj detaljer ▲' : 'Visa detaljer ▼';
+}
+
 function m1PracticalToggleHMode() {
-  m1PracticalState.hMode = !m1PracticalState.hMode;
-  bananaM1PracticalCheck(
-    m1PracticalState.M1,
-    m1PracticalState.kapa,
-    m1PracticalState.alpha,
-    m1PracticalState.instB
-  );
+  bananaHMode = !bananaHMode;
+  m1PracticalState.hMode = bananaHMode;
+  calculate();
 }
 
 function m1PracticalApply() {
@@ -4486,8 +4537,15 @@ function calculate(forceShow = false) {
   const rawM1    = M1;
   const rawKapa  = kapa;
   const adjDelta = rawM1 < M1_MIN ? (M1_MIN - rawM1) : 0;
-  const dispM1   = rawM1 < M1_MIN ? M1_MIN : rawM1;
-  const dispKapa = rawM1 < M1_MIN ? kapa + adjDelta : kapa;
+  let dispM1   = rawM1 < M1_MIN ? M1_MIN : rawM1;
+  let dispKapa = rawM1 < M1_MIN ? kapa + adjDelta : kapa;
+
+  // ── H-styckeläge override — locks M1 = M1_MIN regardless of geometry ──
+  if (bananaHMode) {
+    const hmDelta = M1_MIN - rawM1;
+    dispM1   = M1_MIN;
+    dispKapa = kapa + hmDelta;
+  }
 
   // ── Update cards ─────────────────────────────────────────────────────
   document.getElementById('r-angle').textContent = Math.round(alpha_deg) + '°';
@@ -4502,9 +4560,16 @@ function calculate(forceShow = false) {
   document.getElementById('kd-total').textContent  = Math.round(dispKapa) + ' mm';
   document.getElementById('kapa-card').classList.add('visible');
   const kapaSubLabel = document.getElementById('banana-kapa-sublabel');
-  if (kapaSubLabel) kapaSubLabel.textContent = adjDelta > 0
-    ? `Justerat +${adjDelta}mm (M1 ${Math.round(rawM1)}→${dispM1}mm) · Kapa efter bockning`
-    : 'Kapa här efter bockning (slutlängd)';
+  if (kapaSubLabel) {
+    if (bananaHMode) {
+      const hmDelta = M1_MIN - rawM1;
+      kapaSubLabel.textContent = `H-styckeläge aktivt — M1 låst ${M1_MIN} mm (beräknat ${Math.round(rawM1)} mm) · Kapa efter bockning`;
+    } else if (adjDelta > 0) {
+      kapaSubLabel.textContent = `Justerat +${adjDelta}mm (M1 ${Math.round(rawM1)}→${dispM1}mm) · Kapa efter bockning`;
+    } else {
+      kapaSubLabel.textContent = 'Kapa här efter bockning (slutlängd)';
+    }
+  }
 
   // ── Formula steps ─────────────────────────────────────────────────────
   if (calcMode === 'vinkel') {
