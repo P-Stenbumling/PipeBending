@@ -2644,6 +2644,51 @@ function geCheckClampLength(segLength, pipeSize) {
   return { ok: segLength >= minRequired, minRequired };
 }
 
+// ── FROMAX WORKFLOW DECISION SYSTEM ──────────────────────────────────────
+// Implements two bending workflows: Calculated (precise, measured) vs Practical (fit-and-mark)
+
+function bananaWorkflowDecision(m1, finalLength, bendTool = 'fromax') {
+  const clampOffset = bendTool === 'fromax' ? 40 : (12 * 2); // 40mm for Fromax, else 2×diameter
+  
+  const pipeBeforeM1 = m1; // distance from pipe end to M1
+  
+  // Physical constraint check
+  const canCutFirst = pipeBeforeM1 >= clampOffset;
+  
+  // Workflow choice
+  const workflow = canCutFirst ? 'cut_first' : 'bend_first';
+  
+  // Waste estimation (for bend_first workflow)
+  let minimalRequiredLength = m1 + clampOffset;
+  let wasteEstimate = minimalRequiredLength - finalLength;
+  if (wasteEstimate < 0) wasteEstimate = 0;
+  
+  // Recommended method
+  let recommendedMethod = 'calculated';
+  let explanation = '';
+  
+  if (canCutFirst) {
+    explanation = `Streng nog för clamp-grepp (${Math.round(pipeBeforeM1)}mm ≥ ${clampOffset}mm). ` +
+                  `Kapa först till ${Math.round(finalLength)}mm, bocka sedan vid M1=${Math.round(m1)}mm.`;
+  } else {
+    explanation = `Inte streng nog före M1 för cut-first (${Math.round(pipeBeforeM1)}mm < ${clampOffset}mm). ` +
+                  `Bocka först på full längd, kapa sen till ${Math.round(finalLength)}mm. ` +
+                  `Minsta längd under bockning: ~${Math.round(minimalRequiredLength)}mm (spill: ~${Math.round(wasteEstimate)}mm).`;
+    recommendedMethod = 'practical'; // fallback to practical if geometric constraints fail
+  }
+  
+  return {
+    workflow,
+    canCutFirst,
+    clampOffset,
+    pipeBeforeM1,
+    minimalRequiredLength,
+    wasteEstimate,
+    recommendedMethod,
+    explanation,
+  };
+}
+
 // ── v0.5.5 Human Error Prevention Layer ──────────────────────────────────
 
 // intentionally GLOBAL across all tabs — do NOT scope per-tab
@@ -4078,18 +4123,19 @@ function showError(msg) {
 function bananaClampCheck() {
   const M1    = parseFloat(document.getElementById('m1val').value) || 0;
   const instB = parseFloat(document.getElementById('instickB').value) || 0;
-  const dia   = parseFloat(document.getElementById('diam').value) || 12;
-  const minRequired = bendTool === 'fromax' ? 40 : (2 * dia);
+  
   const hintEl = document.getElementById('banana-m1-hint');
   if (!hintEl) return;
-  const freeBefore = M1 - instB;
-  if (freeBefore > 0) {
-    if (freeBefore < minRequired) {
-      hintEl.textContent = `Arbetsflöde: bocka först. M1 är ${Math.round(M1)}mm från H-änden men verktyget kräver minst ${Math.round(minRequired)}mm före M1 om du kapar först. Kaplängd gäller efter böjning.`;
-      hintEl.classList.add('visible');
-      return;
-    }
+  
+  // Use workflow decision system
+  const decision = bananaWorkflowDecision(M1 - instB, M1, bendTool);
+  
+  if (!decision.canCutFirst) {
+    hintEl.textContent = `Arbetsflöde: bocka först. ${decision.explanation}`;
+    hintEl.classList.add('visible');
+    return;
   }
+  
   hintEl.classList.remove('visible');
 }
 
@@ -4278,9 +4324,9 @@ function calculate(forceShow = false) {
       document.getElementById('bsc-angle').textContent = Math.round(alpha_deg);
       const bscNote = document.getElementById('bsc-note');
       if (bscNote) {
-        const clampMin = bendTool === 'fromax' ? 40 : (2 * dia);
-        if (freeBefore > 0 && freeBefore < clampMin) {
-          bscNote.textContent = `Bocka på full längd först. Kapa till ${Math.round(kapa)} mm efter böjning.`;
+        const workflowDecision = bananaWorkflowDecision(freeBefore, kapa, bendTool);
+        if (!workflowDecision.canCutFirst) {
+          bscNote.textContent = `Bocka på full längd först. Kapa till ${Math.round(kapa)} mm efter böjning. (Spill: ~${Math.round(workflowDecision.wasteEstimate)}mm)`;
         } else {
           bscNote.textContent = autoM1Applied
             ? 'M1 justerades från höjderna för att matcha vald vinkel. Mät alltid från H-stycket.'
@@ -4295,17 +4341,13 @@ function calculate(forceShow = false) {
   }
 
   // ── Stage 4: result-zone warnings ────────────────────────────────────
-  // Clamp lead-in (result zone)
+  // Clamp lead-in (result zone) — use workflow decision system
   const clampLeadEl = document.getElementById('banana-clamp-lead-result');
   if (clampLeadEl) {
-    if (freeBefore > 0) {
-      const clampMin = bendTool === 'fromax' ? 40 : (2 * dia);
-      if (freeBefore < clampMin) {
-        clampLeadEl.textContent = `Arbetsflöde valt: bocka först, kapa sen. M1=${Math.round(M1)}mm och greppkrav är minst ${Math.round(clampMin)}mm före M1 om du kapar först. Kapa till ${Math.round(kapa)}mm först efter böjning.`;
-        clampLeadEl.classList.add('visible');
-      } else {
-        clampLeadEl.classList.remove('visible');
-      }
+    const workflowDecision = bananaWorkflowDecision(freeBefore, kapa, bendTool);
+    if (!workflowDecision.canCutFirst) {
+      clampLeadEl.textContent = `${workflowDecision.explanation} (spill: ~${Math.round(workflowDecision.wasteEstimate)}mm)`;
+      clampLeadEl.classList.add('visible');
     } else {
       clampLeadEl.classList.remove('visible');
     }
