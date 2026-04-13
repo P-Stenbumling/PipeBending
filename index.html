@@ -1319,6 +1319,16 @@
   .m1p-steps { margin: 8px 0 8px 18px; padding: 0; color: #8a9a80; font-size: 12px; line-height: 1.8; }
   .m1p-note { font-size: 11px; color: #4a5a45; font-style: italic; margin-top: 8px; }
   .m1p-simple-hint { font-size: 12px; color: #8a9a80; padding: 4px 0; }
+  .m1p-suggestion { background: #0a1209; border: 1px solid #1e3a1c; border-radius: 4px; padding: 10px 12px; margin: 10px 0 6px; }
+  .m1p-suggestion-label { font-size: 10px; color: #5a7a55; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+  .m1p-hmode-section { margin-top: 12px; }
+  .m1p-hmode-prompt { font-size: 12px; color: #9aaa90; margin-bottom: 7px; }
+  .m1p-hmode-prompt strong { color: #c8d8c0; }
+  .m1p-hmode-btn { display: block; width: 100%; background: #141e12; color: #6a9a60; border: 1px dashed #3a5a30; border-radius: 4px; padding: 8px 12px; font-size: 12px; cursor: pointer; text-align: left; transition: all .15s; }
+  .m1p-hmode-btn:hover { background: #1a2a18; color: #8aba80; border-color: #4a7040; }
+  .m1p-hmode-btn.active { background: #152413; color: #5fcf80; border: 1px solid #3a7040; }
+  .m1p-hmode-result { background: #0e1c0d; border: 1px solid #2a4028; border-radius: 4px; padding: 10px 12px; margin-top: 8px; }
+  .m1p-hmode-result .m1p-adj-val { color: #5fcf80; }
 
 </style>
 </head>
@@ -2714,6 +2724,7 @@ let m1PracticalState = {
   strategy: 'A',
   userM1: null,
   lastCalcM1: null,
+  hMode: false,
 };
 
 function applyWarningHierarchy(tabResultZoneEl) {
@@ -4208,10 +4219,11 @@ function bananaM1PracticalCheck(M1, kapa, alpha_deg, instB) {
   const el = document.getElementById('banana-m1-practical');
   if (!el) return;
 
-  // Reset userM1 when the calculated M1 changes
+  // Reset state when the calculated M1 changes
   if (m1PracticalState.lastCalcM1 !== Math.round(M1)) {
-    m1PracticalState.userM1    = M1_MIN;
+    m1PracticalState.userM1     = M1_MIN;
     m1PracticalState.lastCalcM1 = Math.round(M1);
+    m1PracticalState.hMode      = false;
   }
 
   m1PracticalState.M1    = M1;
@@ -4227,35 +4239,93 @@ function bananaM1PracticalCheck(M1, kapa, alpha_deg, instB) {
 
   const isCritical = M1 < M1_WARN;
   const sevClass   = isCritical ? 'm1p-danger' : 'm1p-warn';
-  const sevLabel   = isCritical
+  const shortfall  = M1_MIN - M1;
+  const adjKapaA   = Math.round(kapa + shortfall);
+  const { strategy, hMode } = m1PracticalState;
+
+  const sevLabel = isCritical
     ? `M1 = ${Math.round(M1)} mm — kritiskt nära kaplinjen`
     : `M1 = ${Math.round(M1)} mm — under rekommenderat minimum (${M1_MIN} mm)`;
 
-  const { strategy } = m1PracticalState;
+  // ── Strategy A quick fix — always visible (both modes) ───────────────
+  const quickFix = `
+    <div class="m1p-suggestion">
+      <div class="m1p-suggestion-label">Rekommendation — flytta böjpunkten ${shortfall} mm:</div>
+      <div class="m1p-adj-row">
+        <span class="m1p-adj-label">M1</span>
+        <span class="m1p-adj-val">${M1_MIN} mm</span>
+        <span class="m1p-adj-note">+${shortfall} mm</span>
+      </div>
+      <div class="m1p-adj-row">
+        <span class="m1p-adj-label">Kaplängd</span>
+        <span class="m1p-adj-val">${adjKapaA} mm</span>
+        <span class="m1p-adj-note">+${shortfall} mm</span>
+      </div>
+      <p class="m1p-note">Böjvinkel och H-stigning oförändrade. Geometrin håller — röret kapas ${shortfall} mm längre.</p>
+    </div>`;
+
+  // ── H-connection mode — always visible (both modes) ──────────────────
+  const hmodeResult = hMode ? `
+    <div class="m1p-hmode-result">
+      <div class="m1p-adj-row">
+        <span class="m1p-adj-label">M1 (delat)</span>
+        <span class="m1p-adj-val">${M1_MIN} mm</span>
+        <span class="m1p-adj-note">Samma bockningsmärke för båda rören</span>
+      </div>
+      <div class="m1p-adj-row">
+        <span class="m1p-adj-label">Kaplängd ×2</span>
+        <span class="m1p-adj-val">${adjKapaA} mm</span>
+        <span class="m1p-adj-note">Kapa båda rören lika</span>
+      </div>
+      <p class="m1p-note">Konsekvent arbetsflöde — ett märke, två identiska rör. Böjvinkel och H-stigning oförändrade.</p>
+    </div>` : '';
+
+  const hmodeSection = `
+    <div class="m1p-hmode-section">
+      <p class="m1p-hmode-prompt">Detta kan vara ett <strong>H-styckeläge</strong> — vill du låsa M1 = ${M1_MIN} mm för båda böjarna?</p>
+      <button type="button" class="m1p-hmode-btn${hMode ? ' active' : ''}" onclick="m1PracticalToggleHMode()">
+        ${hMode ? '✓ H-styckeläge aktivt — M1 = ' + M1_MIN + ' mm låst för båda böjarna' : '⊕ Aktivera H-styckeläge — lås M1 för båda böjarna'}
+      </button>
+      ${hmodeResult}
+    </div>`;
+
+  // ── Advanced: strategies B and C ─────────────────────────────────────
+  const advancedExtra = `
+    <div class="banana-advanced-only">
+      <div class="m1p-strat-label" style="margin-top:12px">Fler alternativ:</div>
+      <div class="m1p-strat-tabs">
+        <button type="button" class="m1p-tab${strategy === 'B' ? ' active' : ''}" onclick="m1PracticalSelect('B')">B — Eget M1</button>
+        <button type="button" class="m1p-tab${strategy === 'C' ? ' active' : ''}" onclick="m1PracticalSelect('C')">C — Frimontage</button>
+      </div>
+      ${(strategy === 'B' || strategy === 'C') ? m1PracticalRenderStrategy() : ''}
+    </div>`;
 
   el.innerHTML = `
     <div class="m1p-header ${sevClass}">⚠ ${sevLabel}</div>
     <div class="m1p-body">
-      <p>Fromax-klonen behöver stabilt rör att greppa vid böjpunkten. Beräkningen är matematiskt korrekt men ${isCritical ? 'kan vara svår att utföra noggrant' : 'riskerar dålig precision i bocken'} vid detta M1-värde.</p>
-      <div class="banana-advanced-only">
-        <div class="m1p-strat-label">Välj strategi:</div>
-        <div class="m1p-strat-tabs">
-          <button type="button" class="m1p-tab${strategy === 'A' ? ' active' : ''}" onclick="m1PracticalSelect('A')">A — Flytta böjpunkt</button>
-          <button type="button" class="m1p-tab${strategy === 'B' ? ' active' : ''}" onclick="m1PracticalSelect('B')">B — Eget M1</button>
-          <button type="button" class="m1p-tab${strategy === 'C' ? ' active' : ''}" onclick="m1PracticalSelect('C')">C — Frimontage</button>
-        </div>
-        ${m1PracticalRenderStrategy()}
-      </div>
-      <div class="banana-simple-only m1p-simple-hint">Bocka på full längd — klämma vid böjpunkten kräver stabilt grepp.</div>
+      <p>Fromax-klonen behöver stabilt rör att greppa vid böjpunkten. Beräkningen är matematiskt korrekt men ${isCritical ? 'kan vara svår att utföra noggrant' : 'riskerar dålig precision'} vid detta M1-värde.</p>
+      ${quickFix}
+      ${hmodeSection}
+      ${advancedExtra}
     </div>`;
 
-  // Re-apply mode visibility since we injected new .banana-advanced-only/.banana-simple-only nodes
+  // Re-apply mode visibility for injected nodes
   document.querySelectorAll('#banana-section .banana-advanced-only').forEach(e =>
     e.classList.toggle('banana-hidden', bananaMode === 'simple'));
   document.querySelectorAll('#banana-section .banana-simple-only').forEach(e =>
     e.classList.toggle('banana-hidden', bananaMode === 'advanced'));
 
   el.classList.add('visible');
+}
+
+function m1PracticalToggleHMode() {
+  m1PracticalState.hMode = !m1PracticalState.hMode;
+  bananaM1PracticalCheck(
+    m1PracticalState.M1,
+    m1PracticalState.kapa,
+    m1PracticalState.alpha,
+    m1PracticalState.instB
+  );
 }
 
 function m1PracticalSelect(s) {
