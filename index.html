@@ -158,6 +158,52 @@
     cursor: pointer;
   }
   .banana-mini-btn:hover { background: #0a1a0d; }
+  .banana-orient-card {
+    margin-top: 12px;
+    background: #0b1110;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 6px;
+    padding: 12px;
+  }
+  .banana-orient-title {
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  .banana-orient-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 10px;
+  }
+  .banana-orient-item {
+    background: #101614;
+    border: 1px solid #1f2824;
+    border-radius: 5px;
+    padding: 8px;
+  }
+  .banana-orient-item h4 {
+    font-size: 0.68rem;
+    color: var(--text);
+    margin-bottom: 6px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .banana-orient-item.bad h4 { color: var(--danger); }
+  .banana-orient-item.good h4 { color: var(--accent2); }
+  .banana-orient-item svg {
+    width: 100%;
+    height: 86px;
+    display: block;
+  }
+  .banana-orient-note {
+    margin-top: 8px;
+    font-size: 0.73rem;
+    color: var(--text-dim);
+    line-height: 1.45;
+  }
 
   /* ── ANGLE PRESETS ── */
   .preset-row {
@@ -1153,6 +1199,102 @@
     opacity: 0.75;
   }
 
+  /* ── FROMAX GUIDE v0.5.9 ── */
+  .fromax-guide-wrap {
+    margin-top: 18px;
+  }
+  .fromax-guide-toggle {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    cursor: pointer;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.82rem;
+    color: var(--accent);
+    width: 100%;
+    text-align: left;
+    letter-spacing: 0.05em;
+  }
+  .fromax-guide-toggle:hover { border-color: var(--accent); }
+  .fromax-guide-toggle .fg-arrow { font-size: 0.7rem; margin-left: auto; transition: transform 0.2s; }
+  .fromax-guide-toggle.open .fg-arrow { transform: rotate(180deg); }
+
+  .fromax-guide-panel {
+    display: none;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    padding: 16px;
+  }
+  .fromax-guide-panel.open { display: block; }
+
+  .fg-controls {
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+    margin-bottom: 14px;
+  }
+  .fg-ctrl-group { display: flex; gap: 4px; }
+  .fg-btn {
+    padding: 5px 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.78rem;
+    cursor: pointer;
+  }
+  .fg-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .fg-btn.active { background: #1a2a1a; border-color: var(--accent2); color: var(--accent2); }
+  .fg-btn.nav { padding: 5px 10px; font-size: 0.9rem; }
+  .fg-btn.nav:disabled { opacity: 0.3; cursor: default; border-color: var(--border); color: var(--text-dim); }
+
+  .fg-step-label {
+    font-size: 0.78rem; color: var(--text-dim);
+    margin-left: auto;
+  }
+  .fg-step-label span { color: var(--accent); font-size: 0.85rem; }
+
+  .fg-canvas-wrap {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: #0a0d0b;
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+  .fg-canvas-wrap canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .fg-step-desc {
+    font-size: 0.8rem;
+    color: var(--text);
+    line-height: 1.5;
+    min-height: 2.5em;
+    padding: 4px 2px;
+  }
+  .fg-step-desc strong { color: var(--accent2); }
+  .fg-step-desc .fg-warn { color: #e8a020; }
+
+  .fg-mode-row {
+    display: flex; gap: 6px; margin-bottom: 10px;
+  }
+  .fg-mode-btn {
+    padding: 4px 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-dim);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.74rem;
+    cursor: pointer;
+  }
+  .fg-mode-btn.active { border-color: var(--accent2); color: var(--accent2); background: #0d1a10; }
+
 </style>
 </head>
 <body>
@@ -1328,14 +1470,14 @@
       </div>
       <div class="field">
         <label for="instickB">Instick B <span>(H-stycke)</span></label>
-        <input type="number" id="instickB" value="10" min="0" step="1" oninput="bananaClampCheck()" title="Instick B i millimeter">
+        <input type="number" id="instickB" value="10" min="0" step="1" oninput="bananaClampCheck(); bananaMaybeAutoFillM1()" title="Instick B i millimeter">
         <div class="hint">Rörets instick i fitting [mm]</div>
       </div>
     </div>
     <div class="input-grid-2 mt">
       <div class="field">
         <label for="tbygger">T-koppling bygger</label>
-        <input type="number" id="tbygger" value="22" min="0" step="1">
+        <input type="number" id="tbygger" value="22" min="0" step="1" oninput="onHeightInput()">
         <div class="hint">Från stam cc till grenrörets mun [mm]</div>
       </div>
       <div class="field flex-end">
@@ -1349,6 +1491,7 @@
     </div>
 
     <button type="button" class="calc-btn" onclick="calculate(true)">▶ BERÄKNA</button>
+
   </div>
 
   <!-- RESULTS -->
@@ -1487,6 +1630,45 @@
 
       <div class="note">
         <strong>OBS:</strong> Ange rätt Fjädringstillägg för ditt material och verktyg (halvhård koppar ≈ 1–2°, hård koppar/stål ≈ 2–3°). Fromax No.55 CLR: 12mm→43mm, 15mm→53mm.
+      </div>
+    </div>
+
+    <!-- ── FROMAX GUIDE v0.5.9 ── -->
+    <div class="fromax-guide-wrap">
+      <button type="button" class="fromax-guide-toggle" id="fg-toggle-btn" onclick="fgToggle()">
+        // Fromax No.55 — steg-för-steg bockguide
+        <span class="fg-arrow">▼</span>
+      </button>
+      <div class="fromax-guide-panel" id="fg-panel">
+
+        <div class="fg-mode-row">
+          <button type="button" class="fg-mode-btn active" id="fg-mode-simple" onclick="fgSetMode('simple')">Enkelt</button>
+          <button type="button" class="fg-mode-btn" id="fg-mode-advanced" onclick="fgSetMode('advanced')">Avancerat</button>
+        </div>
+
+        <div class="fg-controls">
+          <div class="fg-ctrl-group">
+            <button type="button" class="fg-btn active" id="fg-a30" onclick="fgSetAngle(30)">30°</button>
+            <button type="button" class="fg-btn" id="fg-a34" onclick="fgSetAngle(34)">34°</button>
+            <button type="button" class="fg-btn" id="fg-a45" onclick="fgSetAngle(45)">45°</button>
+          </div>
+          <div class="fg-ctrl-group">
+            <button type="button" class="fg-btn active" id="fg-left" onclick="fgSetSide('left')">Vänster</button>
+            <button type="button" class="fg-btn" id="fg-right" onclick="fgSetSide('right')">Höger</button>
+          </div>
+          <div class="fg-ctrl-group" style="margin-left:auto">
+            <button type="button" class="fg-btn nav" id="fg-prev" onclick="fgStep(-1)" disabled>◀</button>
+            <button type="button" class="fg-btn nav" id="fg-next" onclick="fgStep(1)">▶</button>
+          </div>
+          <div class="fg-step-label">Steg <span id="fg-step-num">1</span> / 3</div>
+        </div>
+
+        <div class="fg-canvas-wrap">
+          <canvas id="fg-canvas" width="600" height="260"></canvas>
+        </div>
+
+        <div class="fg-step-desc" id="fg-step-desc"></div>
+
       </div>
     </div>
 
@@ -3717,11 +3899,13 @@ function setAngle(deg, btn) {
   btn.classList.add('active');
   updateHFromAngle();
   bananaUpdateOffsetPreview();
+  bananaMaybeAutoFillM1();
 }
 
 function onLiveInput() {
   if (calcMode === 'vinkel' && lockedAngle !== null) updateHFromAngle();
   bananaUpdateOffsetPreview();
+  bananaMaybeAutoFillM1();
 }
 
 function onWallInput() {
@@ -3744,11 +3928,19 @@ function onHeightInput() {
   } else {
     disp.value = '';
   }
+  bananaMaybeAutoFillM1();
 }
 
-function bananaAutoFillM1() {
+function bananaMaybeAutoFillM1() {
+  if (bananaMode !== 'simple') return;
+  bananaAutoFillM1({ auto: true });
+}
+
+function bananaAutoFillM1(options = {}) {
+  const auto = !!options.auto;
   const hintEl = document.getElementById('banana-m1-auto-hint');
   const setHint = (msg) => { if (hintEl) hintEl.textContent = msg; };
+  if (auto) setHint('');
 
   const D = parseFloat(document.getElementById('djup').value);
   const instB = parseFloat(document.getElementById('instickB').value) || 0;
@@ -3756,9 +3948,9 @@ function bananaAutoFillM1() {
   const A = parseFloat(document.getElementById('hojdA').value);
   const B = parseFloat(document.getElementById('hojdB').value);
 
-  if (isNaN(D) || D <= 0) { setHint('Fyll i giltigt sidmått (D) först.'); return; }
+  if (isNaN(D) || D <= 0) { if (!auto) setHint('Fyll i giltigt sidmått (D) först.'); return; }
   if (isNaN(A) || isNaN(B) || B <= A + tBygg) {
-    setHint('Höjderna är ogiltiga. Kontrollera A, B och T-bygg.');
+    if (!auto) setHint('Höjderna är ogiltiga. Kontrollera A, B och T-bygg.');
     return;
   }
 
@@ -3766,25 +3958,27 @@ function bananaAutoFillM1() {
   let H_diag;
 
   if (calcMode === 'vinkel') {
-    if (lockedAngle === null) { setHint('Välj böjvinkel först för att autofylla M1.'); return; }
+    if (lockedAngle === null) { if (!auto) setHint('Välj böjvinkel först för att autofylla M1.'); return; }
     const geo = geParallelOffset(D, lockedAngle);
-    if (geo.L === Infinity) { setHint('Kunde inte räkna H från vinkel.'); return; }
+    if (geo.L === Infinity) { if (!auto) setHint('Kunde inte räkna H från vinkel.'); return; }
     H_diag = geo.H;
   } else {
     H_diag = parseFloat(document.getElementById('hojd').value);
-    if (isNaN(H_diag) || H_diag <= 0) { setHint('Fyll i giltig rak stigning (H) först.'); return; }
+    if (isNaN(H_diag) || H_diag <= 0) { if (!auto) setHint('Fyll i giltig rak stigning (H) först.'); return; }
   }
 
   const freeBefore = H_rise - H_diag;
   const m1 = freeBefore + instB;
   if (!isFinite(m1) || m1 <= 0) {
-    setHint('M1 blir ogiltigt med nuvarande värden. Kontrollera höjder/vinkel.');
+    if (!auto) setHint('M1 blir ogiltigt med nuvarande värden. Kontrollera höjder/vinkel.');
     return;
   }
 
   const roundedM1 = Math.max(1, Math.round(m1));
   document.getElementById('m1val').value = roundedM1;
-  setHint(`Autofylld M1: ${roundedM1} mm (från H-stycke).`);
+  setHint(auto
+    ? `M1 autoberäknad: ${roundedM1} mm (från H-stycke).`
+    : `Autofylld M1: ${roundedM1} mm (från H-stycke).`);
   bananaClampCheck();
   if (hasCalculatedMain) calculate();
 }
@@ -3814,6 +4008,7 @@ function setBananaMode(mode) {
     setMode('vinkel');
   }
   bananaUpdateOffsetPreview();
+  bananaMaybeAutoFillM1();
   if (hasCalculatedMain) calculate();
 }
 
@@ -4166,6 +4361,9 @@ function calculate(forceShow = false) {
 
   // ── Stage 6: warning hierarchy (LAST) ────────────────────────────────
   applyWarningHierarchy(document.getElementById('results'));
+
+  // ── Sync Fromax guide with calculated values ──────────────────────────
+  fgSyncFromCalc();
 }
 
 // ── Shared SVG helpers ────────────────────────────────────────────────────
@@ -6591,6 +6789,618 @@ function trDraw3D(s1, s2, s3, s4, gap, wallgap, clr, M1, M2, M3) {
 }
 
 // ── Auto-calculate on load ────────────────────────────────────────────────
+// ── FROMAX GUIDE v0.5.9 ─────────────────────────────────────────────────────
+
+const FG = {
+  step: 1,       // 1–3
+  angle: 34,     // synced from calculator
+  side: 'left',  // 'left' | 'right'
+  mode: 'simple',
+  animFrame: null,
+  animEased: 1,
+  // Values read from the calculator after each calculate() call
+  calc: {
+    done:    false,
+    angle:   null,
+    M1:      null,
+    kapa:    null,
+    bendFirst: false,  // true when "bocka först" warning is active
+  },
+};
+
+function fgToggle() {
+  const panel = document.getElementById('fg-panel');
+  const btn   = document.getElementById('fg-toggle-btn');
+  const open  = panel.classList.toggle('open');
+  btn.classList.toggle('open', open);
+  sessionStorage.setItem('fromax_guide_open', open ? '1' : '0');
+  if (open) fgRender();
+}
+
+// Called at the end of calculate() to sync calculated banana values into guide
+function fgSyncFromCalc() {
+  const angleEl    = document.getElementById('r-angle');
+  const m1El       = document.getElementById('r-m1');
+  const kapaEl     = document.getElementById('kapa-value');
+  const clampEl    = document.getElementById('banana-clamp-lead-result');
+  const sbEl       = document.getElementById('springback');
+
+  const djupEl      = document.getElementById('djup');
+  const parsedAngle = angleEl ? parseFloat(angleEl.textContent) : null;
+  const parsedM1    = m1El    ? parseFloat(m1El.textContent)    : null;
+  const parsedKapa  = kapaEl  ? parseFloat(kapaEl.textContent)  : null;
+  const parsedD     = djupEl  ? (parseFloat(djupEl.value) || null) : null;
+  const bendFirst   = clampEl ? clampEl.classList.contains('visible') : false;
+  const springback  = sbEl    ? (parseFloat(sbEl.value) || 0)         : 0;
+
+  FG.calc.done        = !isNaN(parsedAngle) && parsedAngle > 0;
+  FG.calc.angle       = FG.calc.done ? parsedAngle              : null;
+  FG.calc.bendAngle   = FG.calc.done ? parsedAngle + springback : null; // angle to actually bend to
+  FG.calc.springback  = springback;
+  FG.calc.M1          = FG.calc.done ? parsedM1                 : null;
+  FG.calc.kapa        = FG.calc.done ? parsedKapa               : null;
+  FG.calc.D           = parsedD;
+  FG.calc.bendFirst   = bendFirst;
+
+  // Sync angle button to nominal (design) angle
+  if (FG.calc.angle !== null) {
+    const snap = [30, 34, 45].reduce((a, b) =>
+      Math.abs(b - FG.calc.angle) < Math.abs(a - FG.calc.angle) ? b : a);
+    FG.angle = snap;
+    [30, 34, 45].forEach(v => {
+      const el = document.getElementById('fg-a' + v);
+      if (el) el.classList.toggle('active', v === snap);
+    });
+  }
+
+  const panel = document.getElementById('fg-panel');
+  if (panel && panel.classList.contains('open')) fgRender();
+}
+
+function fgSetAngle(a) {
+  FG.angle = a;
+  [30,34,45].forEach(v => {
+    const el = document.getElementById('fg-a' + v);
+    if (el) el.classList.toggle('active', v === a);
+  });
+  fgRender();
+}
+
+function fgSetSide(s) {
+  FG.side = s;
+  document.getElementById('fg-left').classList.toggle('active', s === 'left');
+  document.getElementById('fg-right').classList.toggle('active', s === 'right');
+  fgRender();
+}
+
+function fgSetMode(m) {
+  FG.mode = m;
+  document.getElementById('fg-mode-simple').classList.toggle('active', m === 'simple');
+  document.getElementById('fg-mode-advanced').classList.toggle('active', m === 'advanced');
+  fgRender();
+}
+
+function fgStep(dir) {
+  FG.step = Math.max(1, Math.min(3, FG.step + dir));
+  document.getElementById('fg-step-num').textContent = FG.step;
+  document.getElementById('fg-prev').disabled = FG.step <= 1;
+  document.getElementById('fg-next').disabled = FG.step >= 3;
+  // Step 2 is animated; steps 1 and 3 render instantly
+  if (FG.step === 2) {
+    if (FG.animFrame) cancelAnimationFrame(FG.animFrame);
+    FG.animEased = 0;
+    const start = performance.now();
+    const duration = 900;
+    function tick(now) {
+      const raw = Math.min(1, (now - start) / duration);
+      FG.animEased = raw < 0.5 ? 4*raw*raw*raw : 1 - Math.pow(-2*raw+2,3)/2;
+      fgRender();
+      if (raw < 1) {
+        FG.animFrame = requestAnimationFrame(tick);
+      } else {
+        FG.animEased = 1;
+        fgRender();
+      }
+    }
+    FG.animFrame = requestAnimationFrame(tick);
+  } else {
+    FG.animEased = 1;
+    fgRender();
+  }
+}
+
+function fgRender() {
+  const canvas = document.getElementById('fg-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#0a0d0b';
+  ctx.fillRect(0, 0, W, H);
+  if (FG.step === 1) fgDrawStep1(ctx, W, H);
+  else if (FG.step === 2) fgDrawStep2(ctx, W, H, FG.animEased);
+  else fgDrawStep3(ctx, W, H);
+  fgUpdateDesc();
+}
+
+// ── Drawing helpers ───────────────────────────────────────────────────────
+
+function fgArrow(ctx, x1, y1, x2, y2, color) {
+  const dx = x2-x1, dy = y2-y1, len = Math.sqrt(dx*dx+dy*dy);
+  if (len < 1) return;
+  const ux = dx/len, uy = dy/len, hw = 6, hl = 9;
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2);
+  ctx.strokeStyle = color; ctx.lineWidth = 1.5; ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(x2, y2);
+  ctx.lineTo(x2-ux*hl-uy*hw, y2-uy*hl+ux*hw);
+  ctx.lineTo(x2-ux*hl+uy*hw, y2-uy*hl-ux*hw);
+  ctx.closePath(); ctx.fillStyle = color; ctx.fill();
+}
+
+function fgLabel(ctx, x, y, text, color, size, align) {
+  ctx.font = `${size||11}px 'Share Tech Mono', monospace`;
+  ctx.fillStyle = color;
+  ctx.textAlign = align || 'left';
+  ctx.fillText(text, x, y);
+}
+
+// ── Step 1: Placering ─────────────────────────────────────────────────────
+
+function fgDrawStep1(ctx, W, H) {
+  const flip     = FG.side === 'left' ? 1 : -1;
+  const pivotX   = W / 2;
+  const pipeY    = 92;
+  const formerCY = pipeY + 56;
+  const formerR  = 44;
+  const useM1    = FG.calc.done ? FG.calc.M1   : null;
+  const useKapa  = FG.calc.done ? FG.calc.kapa : null;
+
+  // ── Bend former (gradskiva) ──────────────────────────────────────────────
+  ctx.beginPath();
+  ctx.arc(pivotX, formerCY, formerR, 0, Math.PI * 2);
+  ctx.strokeStyle = '#3a4a38'; ctx.lineWidth = 1.5; ctx.stroke();
+
+  // Degree ticks — 0, 15, 30, 45 arcing from top
+  [0, 15, 30, 45].forEach(deg => {
+    const a  = -Math.PI/2 + flip * deg * Math.PI/180;
+    const ox = pivotX + formerR * Math.cos(a);
+    const oy = formerCY + formerR * Math.sin(a);
+    const nx = Math.cos(a), ny = Math.sin(a);
+    const isZ = deg === 0;
+    ctx.beginPath();
+    ctx.moveTo(ox, oy); ctx.lineTo(ox + nx*(isZ?14:8), oy + ny*(isZ?14:8));
+    ctx.strokeStyle = isZ ? '#e8a020' : '#5a6a55';
+    ctx.lineWidth   = isZ ? 3 : 1; ctx.stroke();
+    if (deg === 0 || deg === 30 || deg === 45)
+      fgLabel(ctx, ox+nx*20, oy+ny*20+4, deg+'°', isZ ? '#e8a020' : '#5a6a55', 9, 'center');
+  });
+
+  // 0° alignment dashed line from former top up through pipe
+  ctx.save(); ctx.setLineDash([3,3]);
+  ctx.beginPath();
+  ctx.moveTo(pivotX, formerCY - formerR); ctx.lineTo(pivotX, pipeY - 20);
+  ctx.strokeStyle = '#e8a020'; ctx.lineWidth = 1.5; ctx.stroke();
+  ctx.restore();
+
+  // ── Pipe drop zone — highlighted channel showing where pipe sits ──────────
+  // Draw the groove/slot in the tool before rendering the pipe
+  const longEnd  = pivotX - flip * 210;
+  const shortEnd = pivotX + flip * 80;
+  ctx.save();
+  ctx.shadowColor = '#3a7bd5';
+  ctx.shadowBlur  = 12;
+  ctx.beginPath();
+  ctx.roundRect(Math.min(longEnd, shortEnd), pipeY - 7, Math.abs(shortEnd - longEnd), 14, 3);
+  ctx.fillStyle = '#0d1a2a';
+  ctx.fill();
+  ctx.restore();
+  // Channel border
+  ctx.beginPath();
+  ctx.roundRect(Math.min(longEnd, shortEnd), pipeY - 7, Math.abs(shortEnd - longEnd), 14, 3);
+  ctx.strokeStyle = '#1e3a5a'; ctx.lineWidth = 1; ctx.stroke();
+  // "Lägg röret här" label inside channel on the long side
+  ctx.save(); ctx.globalAlpha = 0.55;
+  fgLabel(ctx, longEnd + flip*14, pipeY + 3,
+    flip===1 ? '→ Lägg röret här' : 'Lägg röret här ←', '#4a8ad5', 8, flip===1 ? 'left' : 'right');
+  ctx.restore();
+
+  // ── Klon ────────────────────────────────────────────────────────────────
+  const klonW = 22, klonH = 16;
+  const klonX = pivotX - flip * (klonW + 4);
+  ctx.beginPath();
+  ctx.roundRect(klonX, pipeY - klonH/2, klonW, klonH, 3);
+  ctx.fillStyle = '#232e22'; ctx.strokeStyle = '#6a8060'; ctx.lineWidth = 1.5;
+  ctx.fill(); ctx.stroke();
+  fgLabel(ctx, klonX + klonW/2, pipeY - klonH/2 - 5, 'Klon', '#8aaa80', 9, 'center');
+
+  // ── Tool handle bar ──────────────────────────────────────────────────────
+  const armX1 = pivotX, armX2 = pivotX + flip * 180;
+  ctx.beginPath();
+  ctx.roundRect(Math.min(armX1,armX2), pipeY - 8, Math.abs(armX2-armX1), 15, 3);
+  ctx.fillStyle = '#1e2820'; ctx.strokeStyle = '#4a5a48'; ctx.lineWidth = 1.5;
+  ctx.fill(); ctx.stroke();
+  [34, 50, 66].forEach((d, i) => {
+    const mx = pivotX + flip * d;
+    ctx.beginPath();
+    ctx.moveTo(mx, pipeY - 7); ctx.lineTo(mx, pipeY + 6);
+    ctx.strokeStyle = i === 0 ? '#e8a020' : '#8aaa80';
+    ctx.lineWidth = i === 0 ? 2.2 : 1.2; ctx.stroke();
+  });
+  fgLabel(ctx, pivotX + flip*22, pipeY - 13, '1:a streck = 0°', '#8aaa80', 8);
+
+  // ── Pipe ────────────────────────────────────────────────────────────────
+  ctx.beginPath();
+  ctx.moveTo(longEnd, pipeY); ctx.lineTo(shortEnd, pipeY);
+  ctx.strokeStyle = '#3a7bd5'; ctx.lineWidth = 9; ctx.lineCap = 'round'; ctx.stroke();
+  fgLabel(ctx, longEnd + flip*10, pipeY - 16,
+    flip===1 ? '← Lång sida' : 'Lång sida →', '#5a8ad5', 9, flip===1 ? 'left' : 'right');
+
+  // ── M1 mark — prominent ──────────────────────────────────────────────────
+  // Glow
+  ctx.save();
+  ctx.shadowColor = '#e53935'; ctx.shadowBlur = 8;
+  ctx.beginPath();
+  ctx.moveTo(pivotX, pipeY - 18); ctx.lineTo(pivotX, pipeY + 18);
+  ctx.strokeStyle = '#e53935'; ctx.lineWidth = 3.5; ctx.stroke();
+  ctx.restore();
+  // Ghost wrong mark
+  ctx.save(); ctx.globalAlpha = 0.22;
+  ctx.beginPath();
+  ctx.moveTo(pivotX + flip*38, pipeY - 14); ctx.lineTo(pivotX + flip*38, pipeY + 14);
+  ctx.strokeStyle = '#e53935'; ctx.lineWidth = 2; ctx.stroke(); ctx.restore();
+  ctx.save(); ctx.globalAlpha = 0.35;
+  fgLabel(ctx, pivotX + flip*32, pipeY + 30, '✕ fel', '#e53935', 9, 'center');
+  ctx.restore();
+  fgArrow(ctx, pivotX, pipeY - 38, pivotX, pipeY - 22, '#5fcf80');
+  const m1Label = useM1 !== null ? 'M1 = ' + Math.round(useM1) + ' mm' : 'M1 här';
+  fgLabel(ctx, pivotX + 6, pipeY - 40, m1Label, '#5fcf80', 10);
+
+  // ── 0-punkt — dominant referens ──────────────────────────────────────────
+  // Glow ring at 0-mark intersection with gradskiva top
+  const zeroY = formerCY - formerR;
+  ctx.save();
+  ctx.shadowColor = '#e8a020'; ctx.shadowBlur = 18;
+  ctx.beginPath();
+  ctx.arc(pivotX, zeroY, 7, 0, Math.PI * 2);
+  ctx.strokeStyle = '#e8a020'; ctx.lineWidth = 2.5; ctx.stroke();
+  ctx.restore();
+  ctx.beginPath();
+  ctx.arc(pivotX, zeroY, 7, 0, Math.PI * 2);
+  ctx.strokeStyle = '#e8a020'; ctx.lineWidth = 2.5; ctx.stroke();
+  // "REFERENS" label
+  fgLabel(ctx, pivotX + 13, zeroY + 4, 'REFERENS', '#e8a020', 8);
+
+  // ── "Bocka först" warning ─────────────────────────────────────────────────
+  if (FG.calc.bendFirst) {
+    const warnY = H - 28;
+    ctx.fillStyle = '#3a1010';
+    ctx.fillRect(10, warnY - 14, W - 20, 22);
+    ctx.strokeStyle = '#e53935'; ctx.lineWidth = 1;
+    ctx.strokeRect(10, warnY - 14, W - 20, 22);
+    fgLabel(ctx, W/2, warnY + 2,
+      'Bocka på hel längd — kapa EFTER bockning', '#e53935', 10, 'center');
+  }
+
+  // ── Kapa info ────────────────────────────────────────────────────────────
+  if (useKapa !== null && !FG.calc.bendFirst) {
+    fgLabel(ctx, 14, H - 8,
+      'Kapa till ' + Math.round(useKapa) + ' mm', '#8aaa80', 9);
+  }
+
+  // CLR annotation: Advanced mode — step 1 tas bort, se steg 2/3 istället
+  ctx.textAlign = 'left';
+}
+
+// ── Step 2: Böj — animated with proper arc ───────────────────────────────────
+
+function fgDrawStep2(ctx, W, H, t) {
+  const flip         = FG.side === 'left' ? 1 : -1;
+  const nomAngle     = FG.calc.done ? FG.calc.angle     : FG.angle;
+  const useAngle     = FG.calc.done ? FG.calc.bendAngle : FG.angle; // incl. springback
+  const currentAngle = useAngle * t;
+  const currentRad   = currentAngle * Math.PI / 180;
+  const targetRad    = useAngle * Math.PI / 180;
+
+  // Visual CLR radius for the arc (illustrative, not real mm scale)
+  const visR  = 52;
+  // Pipe pivot at approx centre-left
+  const pivX  = W/2 - flip * 40;
+  const pivY  = H/2 + 5;
+  const segIn = 180; // incoming straight length in px
+
+  // Arc geometry:
+  // Incoming pipe is horizontal. The bend goes downward-away from user.
+  // Arc center is directly below pivot (for left-feed bend going downward-right).
+  const arcCX = pivX;
+  const arcCY = pivY + visR;
+  // Start angle of arc: -π/2 (pointing upward from arc center = toward pivot)
+  const arcStart = -Math.PI / 2;
+  // End angle: sweeps clockwise by currentRad (for left feed, flip=1 → right/downward)
+  const arcEnd   = arcStart + flip * currentRad;
+  // Exit point on arc
+  const exitX = arcCX + visR * Math.cos(arcEnd);
+  const exitY = arcCY + visR * Math.sin(arcEnd);
+  // Exit tangent direction (perpendicular to radius at exit, clockwise)
+  const exitDirX = -Math.sin(arcEnd) * flip;
+  const exitDirY =  Math.cos(arcEnd) * flip;
+  // Exit straight segment
+  const segOut = 140;
+  const outEndX = exitX + exitDirX * segOut;
+  const outEndY = exitY + exitDirY * segOut;
+
+  // ── Bend former circle ────────────────────────────────────────────────────
+  ctx.beginPath();
+  ctx.arc(arcCX, arcCY, visR, 0, Math.PI*2);
+  ctx.strokeStyle = '#2a3a28'; ctx.lineWidth = 1.5; ctx.stroke();
+
+  // Degree ticks on former
+  [0, 15, 30, 45].forEach(deg => {
+    if (deg > useAngle + 2) return;
+    const a  = arcStart + flip * deg * Math.PI/180;
+    const ox = arcCX + visR * Math.cos(a);
+    const oy = arcCY + visR * Math.sin(a);
+    const nx = Math.cos(a), ny = Math.sin(a);
+    ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(ox+nx*9, oy+ny*9);
+    ctx.strokeStyle = deg===0 ? '#e8a020' : '#5a6a55';
+    ctx.lineWidth = deg===0 ? 2.2 : 1; ctx.stroke();
+    fgLabel(ctx, ox+nx*17, oy+ny*17, deg+'°',
+      deg===0 ? '#e8a020' : '#5a6a55', 9, 'center');
+  });
+
+  // Target dashed guide (full bend extent — to bendAngle incl. springback)
+  const tArcEnd  = arcStart + flip * targetRad;
+  const tExitX   = arcCX + visR * Math.cos(tArcEnd);
+  const tExitY   = arcCY + visR * Math.sin(tArcEnd);
+  const tDirX    = -Math.sin(tArcEnd) * flip;
+  const tDirY    =  Math.cos(tArcEnd) * flip;
+  ctx.save(); ctx.setLineDash([4,4]);
+  ctx.beginPath(); ctx.moveTo(tExitX, tExitY);
+  ctx.lineTo(tExitX + tDirX*90, tExitY + tDirY*90);
+  ctx.strokeStyle = '#2a4a2a'; ctx.lineWidth = 1.5; ctx.stroke(); ctx.restore();
+
+  // Nominal angle dashed guide (without springback) — shows where pipe settles
+  if (FG.calc.done && FG.calc.springback > 0) {
+    const nomRad   = nomAngle * Math.PI / 180;
+    const nomArcEnd = arcStart + flip * nomRad;
+    const nomExitX  = arcCX + visR * Math.cos(nomArcEnd);
+    const nomExitY  = arcCY + visR * Math.sin(nomArcEnd);
+    const nomDirX   = -Math.sin(nomArcEnd) * flip;
+    const nomDirY   =  Math.cos(nomArcEnd) * flip;
+    ctx.save(); ctx.setLineDash([2,4]); ctx.globalAlpha = 0.5;
+    ctx.beginPath(); ctx.moveTo(nomExitX, nomExitY);
+    ctx.lineTo(nomExitX + nomDirX*70, nomExitY + nomDirY*70);
+    ctx.strokeStyle = '#5fcf80'; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.restore();
+    fgLabel(ctx, nomExitX + nomDirX*76, nomExitY + nomDirY*76,
+      nomAngle + '° efter release', '#5fcf80', 8, 'center');
+  }
+
+  // ── Incoming straight pipe ────────────────────────────────────────────────
+  ctx.beginPath();
+  ctx.moveTo(pivX - flip*segIn, pivY); ctx.lineTo(pivX, pivY);
+  ctx.strokeStyle = '#3a7bd5'; ctx.lineWidth = 9; ctx.lineCap = 'round'; ctx.stroke();
+
+  // M1 mark at pivot
+  ctx.beginPath();
+  ctx.moveTo(pivX, pivY - 13); ctx.lineTo(pivX, pivY + 13);
+  ctx.strokeStyle = '#e53935'; ctx.lineWidth = 3; ctx.stroke();
+
+  // ── Pipe arc (the actual rounded bend) ───────────────────────────────────
+  ctx.beginPath();
+  ctx.arc(arcCX, arcCY, visR, arcStart, arcEnd, flip < 0);
+  ctx.strokeStyle = '#3a7bd5'; ctx.lineWidth = 9;
+  ctx.lineCap = 'round'; ctx.stroke();
+
+  // ── Outgoing straight segment ─────────────────────────────────────────────
+  if (currentAngle > 0.5) {
+    ctx.beginPath();
+    ctx.moveTo(exitX, exitY); ctx.lineTo(outEndX, outEndY);
+    ctx.strokeStyle = '#3a7bd5'; ctx.lineWidth = 9; ctx.lineCap = 'round'; ctx.stroke();
+  }
+
+  // ── Live angle arc indicator ─────────────────────────────────────────────
+  if (currentAngle > 0.5) {
+    ctx.beginPath();
+    ctx.arc(pivX, pivY, 26, -Math.PI/2, -Math.PI/2 + flip*currentRad, flip < 0);
+    ctx.strokeStyle = '#e8a020'; ctx.lineWidth = 2; ctx.stroke();
+    const liveLabel = Math.round(currentAngle) + '°';
+    fgLabel(ctx, pivX + flip*38, pivY - 24, liveLabel, '#e8a020', 15, 'center');
+    // When animation is done, show springback note
+    if (t >= 1 && FG.calc.done && FG.calc.springback > 0) {
+      fgLabel(ctx, pivX + flip*38, pivY - 8,
+        '→ ger ' + nomAngle + '° efter release', '#5fcf80', 9, 'center');
+    }
+  }
+
+  // Pivot dot
+  ctx.beginPath(); ctx.arc(pivX, pivY, 5, 0, Math.PI*2);
+  ctx.fillStyle = '#e8a020'; ctx.fill();
+
+  if (FG.mode === 'advanced') {
+    fgArrow(ctx, arcCX+4, arcCY, arcCX+visR-2, arcCY, '#5a6a55');
+    fgLabel(ctx, arcCX+visR/2, arcCY+14, 'CLR', '#5a6a55', 9, 'center');
+  }
+
+  ctx.textAlign = 'left';
+}
+
+// ── Step 3: Slutresultat ──────────────────────────────────────────────────────
+
+function fgDrawStep3(ctx, W, H) {
+  const flip     = FG.side === 'left' ? 1 : -1;
+  const useAngle = FG.calc.done ? FG.calc.angle : FG.angle;
+  const useM1    = FG.calc.done && FG.calc.M1 !== null ? FG.calc.M1 : null;
+  const useKapa  = FG.calc.done && FG.calc.kapa !== null ? FG.calc.kapa : null;
+  const bendRad  = useAngle * Math.PI / 180;
+  const visR     = 38; // visual arc radius
+
+  // Layout: H-stycke at left, pipe goes right, bends at M1, exits downward
+  const startX   = 55;
+  const pipeY    = 90;
+  // M1 pixel position — proportional to kapa so M1/kapa ratio is preserved
+  const availPx  = 200; // canvas pixels available for the straight run
+  const m1Scale  = (useM1 !== null && useKapa !== null && useKapa > 0)
+    ? Math.max(30, Math.min((useM1 / useKapa) * availPx, availPx - 10))
+    : (useM1 !== null ? Math.min(useM1 * 1.2, 130) : 100);
+  const m1X      = startX + m1Scale;
+  const m1Y      = pipeY;
+
+  // Arc geometry at bend
+  const arcCX = m1X;
+  const arcCY = m1Y + visR;
+  const arcStart = -Math.PI/2;
+  const arcEnd   = arcStart + flip * bendRad;
+  const exitX    = arcCX + visR * Math.cos(arcEnd);
+  const exitY    = arcCY + visR * Math.sin(arcEnd);
+  const exitDirX = -Math.sin(arcEnd) * flip;
+  const exitDirY =  Math.cos(arcEnd) * flip;
+  const outLen   = Math.min(130, W - exitX - 70);
+  const outEndX  = exitX + exitDirX * outLen;
+  const outEndY  = exitY + exitDirY * outLen;
+
+  // ── H-stycke fitting ──────────────────────────────────────────────────────
+  ctx.beginPath(); ctx.roundRect(startX - 14, pipeY - 14, 14, 28, 2);
+  ctx.fillStyle = '#1a2a1a'; ctx.strokeStyle = '#5fcf80'; ctx.lineWidth = 1.5;
+  ctx.fill(); ctx.stroke();
+  fgLabel(ctx, startX - 7, pipeY + 28, '0 mm', '#5fcf80', 8, 'center');
+  fgLabel(ctx, startX - 7, pipeY + 38, 'H-stycke', '#5a6a55', 8, 'center');
+
+  // ── Incoming pipe (H-stycke → M1) ────────────────────────────────────────
+  ctx.beginPath(); ctx.moveTo(startX, pipeY); ctx.lineTo(m1X, m1Y);
+  ctx.strokeStyle = '#3a7bd5'; ctx.lineWidth = 9; ctx.lineCap = 'round'; ctx.stroke();
+
+  // ── Pipe arc (the bend with rounding) ────────────────────────────────────
+  ctx.beginPath();
+  ctx.arc(arcCX, arcCY, visR, arcStart, arcEnd, flip < 0);
+  ctx.strokeStyle = '#3a7bd5'; ctx.lineWidth = 9; ctx.lineCap = 'round'; ctx.stroke();
+
+  // ── Outgoing pipe (after bend → T-koppling) ───────────────────────────────
+  ctx.beginPath(); ctx.moveTo(exitX, exitY); ctx.lineTo(outEndX, outEndY);
+  ctx.strokeStyle = '#3a7bd5'; ctx.lineWidth = 9; ctx.lineCap = 'round'; ctx.stroke();
+
+  // ── T-koppling fitting ────────────────────────────────────────────────────
+  const tcAngle = Math.atan2(exitDirY, exitDirX);
+  ctx.save(); ctx.translate(outEndX, outEndY); ctx.rotate(tcAngle);
+  ctx.beginPath(); ctx.roundRect(0, -14, 14, 28, 2);
+  ctx.fillStyle = '#1a2a1a'; ctx.strokeStyle = '#5a6a55'; ctx.lineWidth = 1.5;
+  ctx.fill(); ctx.stroke(); ctx.restore();
+  fgLabel(ctx, outEndX + 10, outEndY + 28, 'T-kopp.', '#5a6a55', 8, 'center');
+
+  // ── M1 mark ───────────────────────────────────────────────────────────────
+  ctx.beginPath(); ctx.moveTo(m1X, m1Y - 16); ctx.lineTo(m1X, m1Y + 16);
+  ctx.strokeStyle = '#e53935'; ctx.lineWidth = 3; ctx.stroke();
+  ctx.beginPath(); ctx.arc(m1X, m1Y, 5, 0, Math.PI*2);
+  ctx.fillStyle = '#e8a020'; ctx.fill();
+  fgArrow(ctx, m1X, m1Y - 32, m1X, m1Y - 18, '#5fcf80');
+  const m1Lbl = useM1 !== null ? 'M1 = ' + Math.round(useM1) + ' mm' : 'M1';
+  fgLabel(ctx, m1X + 5, m1Y - 34, m1Lbl, '#5fcf80', 10);
+
+  // ── M1 dimension line from H-stycke ──────────────────────────────────────
+  const dimY = pipeY + 52;
+  ctx.save(); ctx.setLineDash([2,3]);
+  ctx.beginPath(); ctx.moveTo(startX, pipeY+5); ctx.lineTo(startX, dimY); ctx.strokeStyle='#5a6a55'; ctx.lineWidth=1; ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(m1X, m1Y+5); ctx.lineTo(m1X, dimY); ctx.stroke();
+  ctx.restore();
+  fgArrow(ctx, startX, dimY, m1X, dimY, '#5a6a55');
+  fgArrow(ctx, m1X, dimY, startX, dimY, '#5a6a55');
+  fgLabel(ctx, (startX+m1X)/2, dimY+13,
+    useM1 !== null ? Math.round(useM1) + ' mm' : 'M1', '#5a6a55', 9, 'center');
+
+  // ── H (stigning) annotation ───────────────────────────────────────────────
+  const hX = Math.min(outEndX + 30, W - 30);
+  ctx.save(); ctx.setLineDash([2,3]);
+  ctx.beginPath(); ctx.moveTo(outEndX+4, pipeY); ctx.lineTo(hX, pipeY); ctx.strokeStyle='#5a6a55'; ctx.lineWidth=1; ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(outEndX+4, outEndY); ctx.lineTo(hX, outEndY); ctx.stroke();
+  ctx.restore();
+  if (Math.abs(outEndY - pipeY) > 10) {
+    fgArrow(ctx, hX, pipeY, hX, outEndY, '#5fcf80');
+    fgArrow(ctx, hX, outEndY, hX, pipeY, '#5fcf80');
+    fgLabel(ctx, hX + 5, (pipeY+outEndY)/2 + 4, 'H', '#5fcf80', 11);
+  }
+
+  // ── Angle arc ─────────────────────────────────────────────────────────────
+  ctx.beginPath(); ctx.arc(m1X, m1Y, 26, 0, -flip*bendRad, flip > 0);
+  ctx.strokeStyle = '#e8a020'; ctx.lineWidth = 1.5; ctx.stroke();
+  fgLabel(ctx, m1X + flip*32, m1Y + 6, useAngle + '°', '#e8a020', 10, 'center');
+
+  // ── Result info row ───────────────────────────────────────────────────────
+  const useD   = (FG.calc.D !== null && FG.calc.D > 0) ? FG.calc.D : 100;
+  const geo    = geParallelOffset(useD, useAngle);
+  const resY   = H - 10;
+  let info = 'α=' + useAngle + '°';
+  if (useKapa !== null) info += '  Kapa=' + Math.round(useKapa) + 'mm';
+  if (useM1   !== null) info += '  M1=' + Math.round(useM1) + 'mm';
+  info += '  H(D=' + useD + ')=' + Math.round(geo.H) + 'mm';
+  fgLabel(ctx, startX, resY, info, '#c8d4c0', 9);
+
+  if (FG.mode === 'advanced') {
+    const bd = geBendDeduction({ angle_deg: useAngle, tool: 'fromax', size: 15, clr: 53 });
+    fgLabel(ctx, startX, resY - 15,
+      'Böjavdrag 15mm Fromax: ' + bd.value.toFixed(1) + 'mm [' + bd.model + ']', '#5a6a55', 9);
+  }
+
+  ctx.textAlign = 'left';
+}
+
+// ── Step descriptions ─────────────────────────────────────────────────────────
+
+function fgUpdateDesc() {
+  const el = document.getElementById('fg-step-desc');
+  if (!el) return;
+  const side    = FG.side === 'left' ? 'vänster' : 'höger';
+  const other   = FG.side === 'left' ? 'höger'   : 'vänster';
+  const angle   = FG.calc.done ? FG.calc.angle : FG.angle;
+  const m1Str   = FG.calc.done && FG.calc.M1   !== null ? '<strong>' + Math.round(FG.calc.M1)   + ' mm</strong>' : 'M1-värdet';
+  const kapaStr = FG.calc.done && FG.calc.kapa !== null ? '<strong>' + Math.round(FG.calc.kapa) + ' mm</strong>' : '—';
+
+  let step1 = `<strong>Placera M1-markeringen mot 0-strecket (REFERENS) på nyckeln.</strong> `
+    + `Markeringen visar var böjen <em>startar</em> — inte mitten av röret. `
+    + `Lång sida till <span class="fg-warn">${side}</span> — kort sida till ${other}. `
+    + `Klonen håller röret mot formaren. `
+    + `<span class="fg-warn">OBS: gradskivan sitter under röret — inte ovan.</span> `
+    + `Ingen rotation behövs för denna böj.`;
+  if (FG.calc.bendFirst)
+    step1 += ` <span class="fg-warn">Bocka på hel längd — kapa EFTER bockning.</span>`;
+  else if (FG.calc.done)
+    step1 += ` Kapa till ${kapaStr}.`;
+
+  const descs = [
+    step1,
+    (() => {
+      const bendTo = FG.calc.done && FG.calc.bendAngle !== null
+        ? FG.calc.bendAngle.toFixed(1) : angle;
+      const sb = FG.calc.done ? FG.calc.springback : 0;
+      let s = `Böj röret till <strong>${bendTo}°</strong>`;
+      if (sb > 0)
+        s += ` — röret fjädrar tillbaka <strong>${sb}°</strong> och landar på <strong>${angle}°</strong>`;
+      s += `. Avläs gradskalan vid pivotpunkten.`;
+      if (FG.calc.done) s += ` M1 = ${m1Str} från H-styckets ände.`;
+      return s;
+    })(),
+    `Klar — bananböj ${angle}°. M1 = ${m1Str} mäts från H-styckets ände (0 mm). `
+    + (FG.calc.done ? `Kaplängd = ${kapaStr}.` : '')
+    + ` Verifiera sidmåttet i appen.`,
+  ];
+  el.innerHTML = descs[FG.step - 1];
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+
+function fgInit() {
+  // Open by default; sessionStorage '0' means user explicitly collapsed it
+  const closed = sessionStorage.getItem('fromax_guide_open') === '0';
+  if (!closed) {
+    document.getElementById('fg-panel').classList.add('open');
+    document.getElementById('fg-toggle-btn').classList.add('open');
+    FG.animEased = 1;
+    fgRender();
+  }
+  fgUpdateDesc();
+}
+
+// ── v0.5.9 end ───────────────────────────────────────────────────────────────
+
 window.onload = () => {
   onHeightInput();
   setPipeSize(12);
@@ -6624,6 +7434,8 @@ window.onload = () => {
   trSetMode(savedTrMode);
   toCheckFieldWarnings();
   trCheckFieldWarnings();
+
+  fgInit();
 
   // Init Bananböj ref-strip and session note
   const bRefStripInput = document.getElementById('banana-ref-strip-input');
