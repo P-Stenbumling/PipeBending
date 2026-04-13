@@ -1329,6 +1329,8 @@
   .m1p-hmode-btn.active { background: #152413; color: #5fcf80; border: 1px solid #3a7040; }
   .m1p-hmode-result { background: #0e1c0d; border: 1px solid #2a4028; border-radius: 4px; padding: 10px 12px; margin-top: 8px; }
   .m1p-hmode-result .m1p-adj-val { color: #5fcf80; }
+  .m1p-apply-btn { display: block; margin-top: 10px; width: 100%; background: #1e3a1c; color: #5fcf80; border: 1px solid #3a7040; border-radius: 4px; padding: 8px 14px; font-size: 12px; font-weight: 600; cursor: pointer; letter-spacing: 0.02em; transition: all .15s; }
+  .m1p-apply-btn:hover { background: #254a22; color: #7fef9f; border-color: #5fcf80; }
 
 </style>
 </head>
@@ -1545,6 +1547,7 @@
     <div class="action-required-header" id="banana-action-header"></div>
     <div class="ref-strip" id="banana-ref-strip-result"></div>
     <div id="banana-clamp-lead-result" class="hint-warn"></div>
+    <div id="banana-m1-practical" class="banana-m1-practical-wrap"></div>
 
     <!-- KAPA hero card -->
     <div class="kapa-card" id="kapa-card">
@@ -1614,7 +1617,6 @@
       </table>
 
       <div id="banana-m1-suspicious" class="hint-warn"></div>
-      <div id="banana-m1-practical" class="banana-m1-practical-wrap"></div>
 
       <!-- Orientation comparison -->
       <div class="panel-title panel-title-mt">Mätläge — jämförelse</div>
@@ -4261,7 +4263,8 @@ function bananaM1PracticalCheck(M1, kapa, alpha_deg, instB) {
         <span class="m1p-adj-val">${adjKapaA} mm</span>
         <span class="m1p-adj-note">+${shortfall} mm</span>
       </div>
-      <p class="m1p-note">Böjvinkel och H-stigning oförändrade. Geometrin håller — röret kapas ${shortfall} mm längre.</p>
+      <p class="m1p-note">Böjvinkel och H-stigning oförändrade. Röret kapas ${shortfall} mm längre.</p>
+      <button type="button" class="m1p-apply-btn" onclick="m1PracticalApply()">Tillämpa — sätt M1 = ${M1_MIN} mm och beräkna om</button>
     </div>`;
 
   // ── H-connection mode — always visible (both modes) ──────────────────
@@ -4326,6 +4329,20 @@ function m1PracticalToggleHMode() {
     m1PracticalState.alpha,
     m1PracticalState.instB
   );
+}
+
+function m1PracticalApply() {
+  const m1Input = document.getElementById('m1val');
+  if (!m1Input) return;
+  // Switch to advanced mode to prevent height-autofill from overriding the applied M1
+  if (typeof bananaMode !== 'undefined' && bananaMode === 'simple') {
+    setBananaMode('advanced');
+    document.querySelectorAll('#banana-section .bm-btn').forEach(b =>
+      b.classList.toggle('active', b.dataset.bmode === 'advanced'));
+  }
+  m1Input.value = M1_MIN;
+  hasCalculatedMain = true;
+  calculate();
 }
 
 function m1PracticalSelect(s) {
