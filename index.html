@@ -1295,6 +1295,31 @@
   }
   .fg-mode-btn.active { border-color: var(--accent2); color: var(--accent2); background: #0d1a10; }
 
+  /* ── M1 Practical Constraint Layer ───────────────────────────────────── */
+  .banana-m1-practical-wrap { display: none; margin-top: 14px; border-radius: 6px; overflow: hidden; border: 1px solid #2a3a28; }
+  .banana-m1-practical-wrap.visible { display: block; }
+  .m1p-header { padding: 10px 14px; font-size: 12px; font-weight: 600; letter-spacing: 0.02em; }
+  .m1p-header.m1p-warn   { background: rgba(230,160,30,.12); color: #e8a020; border-left: 4px solid #e8a020; }
+  .m1p-header.m1p-danger { background: rgba(220,60,50,.12);  color: #e55a55; border-left: 4px solid #e55a55; }
+  .m1p-body { padding: 10px 14px 14px; background: #0d160c; font-size: 12px; color: #8a9a80; }
+  .m1p-body > p { margin: 4px 0 10px; line-height: 1.6; }
+  .m1p-strat-label { font-size: 10px; color: #5a6a55; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 7px; }
+  .m1p-strat-tabs { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+  .m1p-tab { background: #151e14; color: #6a8a60; border: 1px solid #2a3a28; border-radius: 4px; padding: 5px 11px; font-size: 11px; cursor: pointer; transition: all .15s; }
+  .m1p-tab:hover { background: #1c2a1a; color: #8aaa80; }
+  .m1p-tab.active { background: #182816; color: #5fcf80; border-color: #3a7040; }
+  .m1p-detail { background: #0a1209; border: 1px solid #1e2e1c; border-radius: 4px; padding: 12px; }
+  .m1p-detail > strong { color: #b8c8b0; font-size: 12px; display: block; margin-bottom: 10px; }
+  .m1p-adj-row { display: flex; align-items: baseline; gap: 8px; margin: 7px 0; }
+  .m1p-adj-label { color: #5a6a55; font-size: 11px; width: 90px; flex-shrink: 0; }
+  .m1p-adj-val   { color: #5fcf80; font-size: 16px; font-weight: 700; font-family: monospace; min-width: 56px; }
+  .m1p-adj-note  { color: #5a6a55; font-size: 11px; }
+  .m1p-input-row { display: flex; align-items: center; gap: 8px; margin: 8px 0; color: #8a9a80; font-size: 12px; }
+  .m1p-input-row input { width: 66px; background: #141e12; border: 1px solid #3a5030; color: #c8d8c0; border-radius: 4px; padding: 4px 7px; font-size: 13px; text-align: right; }
+  .m1p-steps { margin: 8px 0 8px 18px; padding: 0; color: #8a9a80; font-size: 12px; line-height: 1.8; }
+  .m1p-note { font-size: 11px; color: #4a5a45; font-style: italic; margin-top: 8px; }
+  .m1p-simple-hint { font-size: 12px; color: #8a9a80; padding: 4px 0; }
+
 </style>
 </head>
 <body>
@@ -1579,6 +1604,7 @@
       </table>
 
       <div id="banana-m1-suspicious" class="hint-warn"></div>
+      <div id="banana-m1-practical" class="banana-m1-practical-wrap"></div>
 
       <!-- Orientation comparison -->
       <div class="panel-title panel-title-mt">Mätläge — jämförelse</div>
@@ -2678,6 +2704,17 @@ function bananaWorkflowDecision(m1, finalLength, bendTool = 'fromax') {
 // intentionally GLOBAL across all tabs — do NOT scope per-tab
 // Measures total session exposure to the 15mm empirical estimate (shared escalation signal)
 let estimatedUseCount = 0;
+
+// ── M1 Practical Constraint Layer ────────────────────────────────────────────
+const M1_MIN  = 40; // recommended minimum free pipe before bend mark (mm) — Fromax clamping
+const M1_WARN = 30; // warning threshold below which accuracy is compromised
+
+let m1PracticalState = {
+  M1: null, kapa: null, alpha: null, instB: null,
+  strategy: 'A',
+  userM1: null,
+  lastCalcM1: null,
+};
 
 function applyWarningHierarchy(tabResultZoneEl) {
   if (!tabResultZoneEl) return;
@@ -4110,6 +4147,137 @@ function bananaClampCheck() {
   hintEl.classList.remove('visible');
 }
 
+function m1PracticalRenderStrategy() {
+  const { M1, kapa, strategy, userM1 } = m1PracticalState;
+  if (M1 === null || kapa === null) return '';
+  const shortfall = M1_MIN - M1;
+  const adjKapaA  = Math.round(kapa + shortfall);
+
+  if (strategy === 'A') {
+    return `<div class="m1p-detail">
+      <strong>Flytta böjpunkten ${shortfall} mm längre in på röret.</strong>
+      <div class="m1p-adj-row">
+        <span class="m1p-adj-label">Nytt M1</span>
+        <span class="m1p-adj-val">${M1_MIN} mm</span>
+        <span class="m1p-adj-note">(+${shortfall} mm)</span>
+      </div>
+      <div class="m1p-adj-row">
+        <span class="m1p-adj-label">Ny kaplängd</span>
+        <span class="m1p-adj-val">${adjKapaA} mm</span>
+        <span class="m1p-adj-note">(+${shortfall} mm)</span>
+      </div>
+      <p class="m1p-note">Böjvinkel och H-stigning är oförändrade. Röret kapas ${shortfall} mm längre — böjpunkten sitter ${M1_MIN} mm från kaplinjen.</p>
+    </div>`;
+  }
+
+  if (strategy === 'B') {
+    const uM1   = userM1 !== null ? userM1 : M1_MIN;
+    const delta = uM1 - M1;
+    const uKapa = Math.round(kapa + delta);
+    const sign  = delta >= 0 ? '+' : '';
+    return `<div class="m1p-detail">
+      <strong>Ange önskat M1-värde:</strong>
+      <div class="m1p-input-row">
+        <label>M1 =</label>
+        <input type="number" id="m1p-user-m1" value="${uM1}" min="1" step="1" oninput="m1PracticalUserM1(this.value)"> mm
+      </div>
+      <div class="m1p-adj-row">
+        <span class="m1p-adj-label">Kaplängd</span>
+        <span class="m1p-adj-val">${uKapa} mm</span>
+        <span class="m1p-adj-note">${sign}${delta} mm vs beräknat</span>
+      </div>
+      <p class="m1p-note">Böjvinkel och H-stigning är oförändrade. Kaplängden justeras linjärt med M1-förändringen.</p>
+    </div>`;
+  }
+
+  if (strategy === 'C') {
+    return `<div class="m1p-detail">
+      <strong>Frimontage — utan fast M1-märke.</strong>
+      <ol class="m1p-steps">
+        <li>Bocka röret på full längd utan märke — uppskatta böjpunkten visuellt.</li>
+        <li>Prova mot H-stycke och T-koppling — justera bocken tills geometrin stämmer.</li>
+        <li>Bekräfta läget och kapa sist.</li>
+      </ol>
+      <p class="m1p-note">Lämpligt vid trångt utrymme eller när beräknat M1 är för nära änden för säkert verktyggrepp. Kräver erfarenhet och provmontering.</p>
+    </div>`;
+  }
+  return '';
+}
+
+function bananaM1PracticalCheck(M1, kapa, alpha_deg, instB) {
+  const el = document.getElementById('banana-m1-practical');
+  if (!el) return;
+
+  // Reset userM1 when the calculated M1 changes
+  if (m1PracticalState.lastCalcM1 !== Math.round(M1)) {
+    m1PracticalState.userM1    = M1_MIN;
+    m1PracticalState.lastCalcM1 = Math.round(M1);
+  }
+
+  m1PracticalState.M1    = M1;
+  m1PracticalState.kapa  = kapa;
+  m1PracticalState.alpha = alpha_deg;
+  m1PracticalState.instB = instB;
+
+  if (M1 >= M1_MIN) {
+    el.innerHTML = '';
+    el.classList.remove('visible');
+    return;
+  }
+
+  const isCritical = M1 < M1_WARN;
+  const sevClass   = isCritical ? 'm1p-danger' : 'm1p-warn';
+  const sevLabel   = isCritical
+    ? `M1 = ${Math.round(M1)} mm — kritiskt nära kaplinjen`
+    : `M1 = ${Math.round(M1)} mm — under rekommenderat minimum (${M1_MIN} mm)`;
+
+  const { strategy } = m1PracticalState;
+
+  el.innerHTML = `
+    <div class="m1p-header ${sevClass}">⚠ ${sevLabel}</div>
+    <div class="m1p-body">
+      <p>Fromax-klonen behöver stabilt rör att greppa vid böjpunkten. Beräkningen är matematiskt korrekt men ${isCritical ? 'kan vara svår att utföra noggrant' : 'riskerar dålig precision i bocken'} vid detta M1-värde.</p>
+      <div class="banana-advanced-only">
+        <div class="m1p-strat-label">Välj strategi:</div>
+        <div class="m1p-strat-tabs">
+          <button type="button" class="m1p-tab${strategy === 'A' ? ' active' : ''}" onclick="m1PracticalSelect('A')">A — Flytta böjpunkt</button>
+          <button type="button" class="m1p-tab${strategy === 'B' ? ' active' : ''}" onclick="m1PracticalSelect('B')">B — Eget M1</button>
+          <button type="button" class="m1p-tab${strategy === 'C' ? ' active' : ''}" onclick="m1PracticalSelect('C')">C — Frimontage</button>
+        </div>
+        ${m1PracticalRenderStrategy()}
+      </div>
+      <div class="banana-simple-only m1p-simple-hint">Bocka på full längd — klämma vid böjpunkten kräver stabilt grepp.</div>
+    </div>`;
+
+  // Re-apply mode visibility since we injected new .banana-advanced-only/.banana-simple-only nodes
+  document.querySelectorAll('#banana-section .banana-advanced-only').forEach(e =>
+    e.classList.toggle('banana-hidden', bananaMode === 'simple'));
+  document.querySelectorAll('#banana-section .banana-simple-only').forEach(e =>
+    e.classList.toggle('banana-hidden', bananaMode === 'advanced'));
+
+  el.classList.add('visible');
+}
+
+function m1PracticalSelect(s) {
+  m1PracticalState.strategy = s;
+  bananaM1PracticalCheck(
+    m1PracticalState.M1,
+    m1PracticalState.kapa,
+    m1PracticalState.alpha,
+    m1PracticalState.instB
+  );
+}
+
+function m1PracticalUserM1(val) {
+  m1PracticalState.userM1 = parseFloat(val) || M1_MIN;
+  bananaM1PracticalCheck(
+    m1PracticalState.M1,
+    m1PracticalState.kapa,
+    m1PracticalState.alpha,
+    m1PracticalState.instB
+  );
+}
+
 // ── Main calculation ───────────────────────────────────────────────────────
 function calculate(forceShow = false) {
   if (forceShow) hasCalculatedMain = true;
@@ -4370,6 +4538,9 @@ function calculate(forceShow = false) {
   const wallT = parseFloat(document.getElementById('wallT').value);
   const wallH = parseFloat(document.getElementById('wallH').value);
   drawDiagram(D, H_diag, L, alpha_deg, M1, dia, hojdA, hojdB, instA, instB, tBygg, wallT, wallH);
+
+  // ── M1 practical constraint check ────────────────────────────────────
+  bananaM1PracticalCheck(M1, kapa, alpha_deg, instB);
 
   // ── Stage 6: warning hierarchy (LAST) ────────────────────────────────
   applyWarningHierarchy(document.getElementById('results'));
