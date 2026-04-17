@@ -3180,6 +3180,7 @@ let mbMiddleReferenceMode = 'auto';
 let mbFittings = [];
 let mbLaStart      = 10;
 let mbLaSlut       = 10;
+let mbStartInsertionDepth = 0;
 let mbStartAddsLa  = true;
 let mbFittingIdStart = '';
 let mbFittingIdSlut  = '';
@@ -3225,7 +3226,7 @@ function mbGetAdjustmentReason(i, useClamp, isCC) {
   if (i === 0) {
     const parts = [];
     if (useClamp) parts.push('väggfäste');
-    if (mbStartAddsLa && mbLaStart) parts.push('koppling');
+    if (mbStartInsertionDepth) parts.push('instick');
     return parts.join(' + ') || 'justering';
   }
   if (i === last) {
@@ -3266,8 +3267,8 @@ function mbRecomputeAdjustments() {
   mbAdjustments = mbSegments.map(() => 0);
   if (!n) return;
 
-  if (useClamp) mbAdjustments[0] += build;
-  if (mbStartAddsLa) mbAdjustments[0] += mbLaStart;
+  if (useClamp) mbAdjustments[0] -= build;
+  if (mbStartInsertionDepth) mbAdjustments[0] += mbStartInsertionDepth;
   if (n > 1) {
     const isCC = !!document.getElementById('mb-slut-cc')?.checked;
     if (isCC) {
@@ -3279,10 +3280,10 @@ function mbRecomputeAdjustments() {
     }
   }
 
-  // Middle segments: wall-reference build compensation
+  // Middle segments: deterministic wall-based alternation (-,+,-,+ ...)
   if (useClamp) {
     for (let i = 1; i < n - 1; i++) {
-      mbAdjustments[i] = mbMiddleReferenceMode === 'edge' ? 0 : build;
+      mbAdjustments[i] = mbMiddleReferenceMode === 'edge' ? 0 : (i % 2 === 1 ? -build : build);
     }
   }
 }
@@ -3328,6 +3329,7 @@ function mbFittingSelected(end) {
     const La = fit?.dimensioner?.[String(dy)]?.La ?? 0;
     laInp.value = La;
     if (end === 'start') {
+      mbStartInsertionDepth = fit?.insertionDepth?.[String(dy)] ?? 0;
       mbLaStart     = La;
       mbStartAddsLa = fit?.addsLaAtStart ?? true;
     } else {
@@ -3338,7 +3340,7 @@ function mbFittingSelected(end) {
     }
   } else {
     laInp.value = 0;
-    if (end === 'start') { mbLaStart = 0; mbStartAddsLa = true; }
+    if (end === 'start') { mbLaStart = 0; mbStartInsertionDepth = 0; mbStartAddsLa = true; }
     else { mbLaSlut = 0; }
   }
   mbRefreshEnd();

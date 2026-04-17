@@ -9,6 +9,10 @@
       "typ": "skarvkoppling",
       "defaultCC": false,
       "addsLaAtStart": true,
+      "insertionDepth": {
+        "12": 10,
+        "15": 12
+      },
       "beskrivning": "Vatette Klämringskoppling. Består av skruvdel, klämring och mutter. För kopparrör, rostfria- och elförzinkade stålrör och PEX-rör. Kopplingarna är försmorda och kräver normalt ingen ytterligare smörjning. Lättrade rörgängor på raka kopplingar med planända (typ 1136). Samtliga produkter med Vatette-ända kan kompletteras med kopplingsset för olika rörtyper. Vattenberörda delar samt muttrar (märkta med CR) är av typgodkänd avzinkningshärdig mässing.",
       "bild": null,
       "dimensioner": {
