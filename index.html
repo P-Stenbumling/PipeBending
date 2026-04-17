@@ -3242,7 +3242,7 @@ function mbRecomputeAdjustments() {
   mbAdjustments = mbSegments.map(() => 0);
   if (!n) return;
 
-  if (useClamp) mbAdjustments[0] -= build;
+  if (useClamp) mbAdjustments[0] += build;
   if (mbStartAddsLa) mbAdjustments[0] += mbLaStart;
   if (n > 1) {
     const isCC = !!document.getElementById('mb-slut-cc')?.checked;
@@ -3255,10 +3255,10 @@ function mbRecomputeAdjustments() {
     }
   }
 
-  // Middle segments: deterministic wall-based alternation (-,+,-,+ ...)
+  // Middle segments: wall-reference build compensation
   if (useClamp) {
     for (let i = 1; i < n - 1; i++) {
-      mbAdjustments[i] = mbMiddleReferenceMode === 'edge' ? 0 : (i % 2 === 1 ? -build : build);
+      mbAdjustments[i] = mbMiddleReferenceMode === 'edge' ? 0 : build;
     }
   }
 }
