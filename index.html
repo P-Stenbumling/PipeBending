@@ -3264,7 +3264,7 @@ function mbGetSegmentOffsetFlow(i, useClamp) {
       flow.push({ prefix: 'Offset', dir: 'left', value: -planeOffset, label: 'rörplan → centrum' });
     }
     if (mbLaSlut) {
-      flow.push({ prefix: 'La', dir: 'right', value: isCC ? -mbLaSlut : mbLaSlut, label: isCC ? 'CC' : 'slutkoppling' });
+      flow.push({ prefix: 'La', dir: 'right', value: isCC ? -mbLaSlut : mbLaSlut, label: isCC ? '(CC)' : 'slutkoppling' });
     }
     return flow;
   }
