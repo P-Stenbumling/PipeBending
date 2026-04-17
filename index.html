@@ -639,9 +639,36 @@
     border: 1px solid #2a3820;
     border-left: 3px solid var(--accent2);
     border-radius: 6px;
-    padding: 12px 14px;
+    padding: 10px 14px;
     margin-bottom: 14px;
   }
+  .mb-comp-toggle-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .mb-comp-toggle-row label {
+    cursor: pointer;
+    font-size: 0.8rem;
+    color: var(--text);
+    flex: 1;
+  }
+  .mb-comp-toggle-row input[type="checkbox"] {
+    accent-color: var(--accent2);
+    transform: translateY(1px);
+  }
+  .mb-comp-chevron {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    transition: transform 0.15s;
+  }
+  .mb-comp-body {
+    display: none;
+    margin-top: 10px;
+  }
+  .mb-comp-body.open { display: block; }
   .mb-comp-title {
     color: var(--accent2);
     font-size: 0.68rem;
@@ -1869,49 +1896,45 @@
         <span class="bd-label mb-advanced-only">mm</span>
       </div>
       <div class="mb-comp-box">
-        <div class="mb-comp-title">v0.6.0 - Förenklad montagekompensation</div>
-        <div class="mb-comp-grid">
-          <div class="field">
-            <label><input type="checkbox" id="mb-use-clamp" checked> Använd fäste-kompensation</label>
-            <div class="hint">Default: på (väggrelation styr tecken)</div>
-          </div>
-          <div class="field">
-            <label for="mb-fixture-build">Fästen bygger ut</label>
-            <input type="number" id="mb-fixture-build" value="20" min="0" step="1">
-            <div class="hint">mm från vägg</div>
-          </div>
+        <div class="mb-comp-toggle-row" onclick="mbToggleComp()">
+          <input type="checkbox" id="mb-use-clamp" checked onclick="event.stopPropagation();mbInitCompInputs()">
+          <label for="mb-use-clamp">Anpassa för montering (20 mm väggfäste)</label>
+          <span class="mb-comp-chevron" id="mb-comp-chevron">▼</span>
         </div>
-        <div class="mb-end-grid mb-advanced-only">
-          <div class="mb-end-col">
-            <div class="mb-end-col-label">Start-koppling</div>
-            <select id="mb-fitting-start" onchange="mbFittingSelected('start')"></select>
-            <div class="mb-end-la-row">
-              <span>Instick (La)</span>
-              <input type="number" id="mb-end-la-start" value="10" min="0" step="1" oninput="mbLaChanged('start')">
-              <span>mm</span>
+        <div class="mb-comp-body" id="mb-comp-body">
+          <div class="mb-comp-grid" style="margin-top:4px;">
+            <div class="field">
+              <label for="mb-fixture-build">Fästen bygger ut</label>
+              <input type="number" id="mb-fixture-build" value="20" min="0" step="1">
+              <div class="hint">mm från vägg</div>
             </div>
           </div>
-          <div class="mb-end-col">
-            <div class="mb-end-col-label">Slut-koppling</div>
-            <select id="mb-fitting-slut" onchange="mbFittingSelected('slut')"></select>
-            <div class="mb-end-la-row">
-              <span>Instick (La)</span>
-              <input type="number" id="mb-end-la-slut" value="10" min="0" step="1" oninput="mbLaChanged('slut')">
-              <span>mm</span>
+          <div class="mb-end-grid mb-advanced-only">
+            <div class="mb-end-col">
+              <div class="mb-end-col-label">Start-koppling</div>
+              <select id="mb-fitting-start" onchange="mbFittingSelected('start')"></select>
+              <div class="mb-end-la-row">
+                <span>Instick (La)</span>
+                <input type="number" id="mb-end-la-start" value="10" min="0" step="1" oninput="mbLaChanged('start')">
+                <span>mm</span>
+              </div>
             </div>
-            <div class="mb-end-la-row mb-advanced-only" style="margin-top:8px;">
-              <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
-                <input type="checkbox" id="mb-slut-cc" onchange="mbRefreshEnd()" style="accent-color:var(--accent2);">
-                <span style="font-size:0.7rem;color:var(--text-dim);">Mätt till CC</span>
-              </label>
+            <div class="mb-end-col">
+              <div class="mb-end-col-label">Slut-koppling</div>
+              <select id="mb-fitting-slut" onchange="mbFittingSelected('slut')"></select>
+              <div class="mb-end-la-row">
+                <span>Instick (La)</span>
+                <input type="number" id="mb-end-la-slut" value="10" min="0" step="1" oninput="mbLaChanged('slut')">
+                <span>mm</span>
+              </div>
+              <div class="mb-end-la-row mb-advanced-only" style="margin-top:8px;">
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+                  <input type="checkbox" id="mb-slut-cc" onchange="mbRefreshEnd()" style="accent-color:var(--accent2);">
+                  <span style="font-size:0.7rem;color:var(--text-dim);">Mätt till CC</span>
+                </label>
+              </div>
             </div>
           </div>
-        </div>
-        <div id="mb-comp-note" class="mb-comp-note">Auto: appen räknar justeringar från 20/10 direkt. Ingen manuell +/- krävs.</div>
-        <div id="mb-comp-guard" class="mb-comp-guard">
-          <div id="mb-comp-guard-text" class="mb-comp-guard-text">Tips: Mellansträckor verkar använda olika referenser (centrum/kant). Det kan göra hörnet för tight.</div>
-          <button type="button" class="mb-add-btn" onclick="mbApplyEdgeReferenceMiddle()">Använd kant-referens för mellansträckor</button>
-          <div class="mb-comp-guard-hint">För trappor är mellansträckor oftast vägg→kant (0 mm).</div>
         </div>
       </div>
 
@@ -3238,77 +3261,41 @@ function mbRefreshEnd() {
   if (document.getElementById('mb-results')?.style.display === 'block') mbCalculate();
 }
 
-function mbShouldShowReferenceGuard() {
-  const { useClamp, build } = mbGetFixtureConfig();
-  if (mbMode !== 'simple' || !useClamp || build <= 0 || mbMiddleReferenceMode !== 'auto') return false;
-  const middle = mbAdjustments.slice(1, -1);
-  if (middle.length < 2 || mbDirs.length < 2) return false;
-  const hasNeg = middle.some(v => mbAdjustmentMatches(v, -build));
-  const hasZeroOrPos = middle.some(v => mbAdjustmentMatches(v, 0) || mbAdjustmentMatches(v, build));
-  return hasNeg && hasZeroOrPos;
+function mbToggleComp() {
+  const body = document.getElementById('mb-comp-body');
+  const chev = document.getElementById('mb-comp-chevron');
+  if (!body) return;
+  const open = body.classList.toggle('open');
+  if (chev) chev.textContent = open ? '▲' : '▼';
 }
 
-function mbUpdateReferenceGuard() {
-  const guard = document.getElementById('mb-comp-guard');
-  const text = document.getElementById('mb-comp-guard-text');
-  if (!guard || !text) return;
-  if (mbShouldShowReferenceGuard()) {
-    text.textContent = 'Tips: Mellansträckor verkar använda olika referenser (centrum/kant). Det kan göra hörnet för tight.';
-    guard.classList.add('visible');
-  } else {
-    guard.classList.remove('visible');
-  }
-}
+function mbUpdateCompNote() {}
 
-function mbApplyEdgeReferenceMiddle() {
-  mbMiddleReferenceMode = 'edge';
-  mbRecomputeAdjustments();
-  mbRenderSegments();
-  mbUpdateCompNote();
-  mbUpdateReferenceGuard();
-  if (document.getElementById('mb-results')?.style.display === 'block') mbCalculate();
-}
-
-function mbUpdateCompNote() {
-  const note = document.getElementById('mb-comp-note');
-  if (!note) return;
-  const { useClamp, build } = mbGetFixtureConfig();
-  const adjTotal = mbAdjustments.reduce((s, v) => s + (parseFloat(v) || 0), 0);
-  const middleModeText = mbMiddleReferenceMode === 'edge' ? 'kant-referens i mitten' : 'auto i mitten';
-  note.textContent =
-    `Fäste-komp: ${useClamp ? 'PÅ' : 'AV'} | bygg = ${Math.round(build)} mm | La start = ${mbLaStart} mm | La slut = ${mbLaSlut} mm | ${middleModeText} | autojustering totalt = ${adjTotal >= 0 ? '+' : ''}${Math.round(adjTotal)} mm`;
-}
+function mbUpdateReferenceGuard() {}
 
 function mbApplySnaplockPreset() {
   mbRecomputeAdjustments();
   mbRenderSegments();
-  mbUpdateCompNote();
 }
 
 function mbClearAdjustments() {
   mbAdjustments = mbSegments.map(() => 0);
   mbRenderSegments();
-  mbUpdateCompNote();
 }
 
 function mbInitCompInputs() {
-  ['mb-use-clamp', 'mb-fixture-build'].forEach((id) => {
-    const el = document.getElementById(id);
-    if (!el) return;
+  const buildEl = document.getElementById('mb-fixture-build');
+  if (buildEl) {
     const refresh = () => {
       mbMiddleReferenceMode = 'auto';
       mbRecomputeAdjustments();
       mbRenderSegments();
-      mbUpdateCompNote();
-      mbUpdateReferenceGuard();
       if (document.getElementById('mb-results')?.style.display === 'block') mbCalculate();
     };
-    el.addEventListener('input', refresh);
-    el.addEventListener('change', refresh);
-  });
+    buildEl.addEventListener('input', refresh);
+    buildEl.addEventListener('change', refresh);
+  }
   mbRecomputeAdjustments();
-  mbUpdateCompNote();
-  mbUpdateReferenceGuard();
 }
 
 function mbSetMode(mode) {
