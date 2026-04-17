@@ -542,6 +542,26 @@
   .mbsc-label { color:var(--text-dim); font-size:0.82rem; flex:1; }
   .mbsc-val { font-size:1.45rem; font-weight:bold; color:var(--accent); font-family:'Share Tech Mono', monospace; }
   .mbsc-unit { color:var(--text-dim); font-size:0.78rem; }
+  .mb-trappan {
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--border);
+  }
+  .mb-trappan-label {
+    color: var(--accent2);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  #mb-trappan-output {
+    margin: 0;
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.78rem;
+    line-height: 1.45;
+    white-space: pre-wrap;
+  }
 
   .mb-top-grid {
     display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -1996,6 +2016,10 @@
         <div class="mbsc-row"><span class="mbsc-label">Kapa röret till</span><span class="mbsc-val" id="mbsc-total">—</span><span class="mbsc-unit">mm</span></div>
         <div class="mbsc-row"><span class="mbsc-label">Antal böjar</span><span class="mbsc-val" id="mbsc-bends">—</span><span class="mbsc-unit">st</span></div>
         <div class="mbsc-row"><span class="mbsc-label">Första märke från START</span><span class="mbsc-val" id="mbsc-first">—</span><span class="mbsc-unit">mm</span></div>
+        <div class="mb-trappan">
+          <div class="mb-trappan-label">Trappan (fältteknik)</div>
+          <pre id="mb-trappan-output">—</pre>
+        </div>
         <div id="mbsc-note" class="hint"></div>
         <div id="mbsc-measure-hint" class="hint">Mät alltid från START — inte mellan märken.</div>
       </div>
@@ -3680,6 +3704,26 @@ function mbComputeMarks(segs, bd) {
   return marks;
 }
 
+function mbRenderTrappan(segments, bendDeduction) {
+  const lines = [];
+  const bd = Math.round(bendDeduction);
+  for (let i = 0; i < segments.length; i++) {
+    const base = Math.round(segments[i]);
+    const isFirst = i === 0;
+    const isLast = i === segments.length - 1;
+    if (isFirst) {
+      lines.push(`${base} mm`);
+      continue;
+    }
+    if (isLast) {
+      lines.push(`+ ${base} mm`);
+    } else {
+      lines.push(`+ ${Math.round(base - bd)} mm (${base} − ${bd})`);
+    }
+  }
+  return lines.join('\n');
+}
+
 function mbCalculate() {
   const bd      = mbGetBendDeduction();
   const { useClamp } = mbGetFixtureConfig();
@@ -3703,6 +3747,10 @@ function mbCalculate() {
   document.getElementById('mb-total-val').textContent    = Math.round(total);
   document.getElementById('mb-bend-count').textContent   = nBends;
   document.getElementById('mb-total-deduct').textContent = Math.round(totalDeduct);
+  const trappanEl = document.getElementById('mb-trappan-output');
+  if (trappanEl) {
+    trappanEl.textContent = mbRenderTrappan(effectiveSegments, bd);
+  }
   const deductSummaryEl = document.getElementById('mb-deduct-summary');
   if (deductSummaryEl) {
     deductSummaryEl.innerHTML = `Antal böjar: <strong>${nBends}</strong><br>
