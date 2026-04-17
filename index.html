@@ -4112,7 +4112,7 @@ function mbDrawIsoDiagram(marks, nBends, total, segs = mbSegments) {
 
 function setMode(mode) {
   calcMode = mode;
-  document.querySelectorAll('.mode-btn').forEach(b =>
+  document.querySelectorAll('#banana-section .mode-btn').forEach(b =>
     b.classList.toggle('active', b.dataset.mode === mode));
 
   const pr    = document.getElementById('preset-row');
