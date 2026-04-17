@@ -566,6 +566,17 @@
     border-bottom: 1px solid #1a1f1a;
     transition: background 0.1s;
   }
+  .mb-segments-simple .mb-seg-header,
+  .mb-segments-simple .mb-seg-row {
+    grid-template-columns: 90px minmax(120px, 1fr) minmax(100px, 1fr) auto;
+  }
+  .mb-dir-btn.dir-arrow {
+    flex: 0 0 42px;
+    font-size: 1rem;
+    padding: 6px 0;
+    text-align: center;
+    letter-spacing: 0;
+  }
   .mb-seg-row:hover { background: #131713; }
   .mb-seg-label {
     font-size: 0.72rem; color: var(--text-dim); letter-spacing: 0.05em;
@@ -1942,7 +1953,7 @@
       <div class="section-label">Sträckor &amp; riktningar</div>
       <div class="mb-segments-wrap">
         <div class="mb-seg-header">
-          <span>Stracka</span><span>Langd bas (mm)</span><span>Autojustering</span><span>Bojriktning (i fardriktning)</span><span></span>
+          <span>Sträcka</span><span>Längd (mm)</span><span class="mb-advanced-only">Justering</span><span>Riktning</span><span></span>
         </div>
         <div id="mb-seg-list"></div>
       </div>
@@ -3307,6 +3318,7 @@ function mbSetMode(mode) {
     el.classList.toggle('mb-hidden', mode === 'advanced'));
   document.querySelectorAll('.mbm-btn').forEach(btn =>
     btn.classList.toggle('active', btn.dataset.mbmode === mode));
+  document.querySelector('.mb-segments-wrap')?.classList.toggle('mb-segments-simple', mode === 'simple');
 
   const simpleCard = document.getElementById('mb-simple-card');
   const resultsVisible = document.getElementById('mb-results')?.style.display === 'block';
@@ -3441,12 +3453,21 @@ function mbRenderSegments() {
       mbSegments[i] = parseFloat(inp.value) || 0;
     });
 
+    inp.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const inputs = [...document.querySelectorAll('#mb-seg-list .mb-seg-input')];
+        const next = inputs[inputs.indexOf(inp) + 1];
+        if (next) next.focus(); else inp.blur();
+      }
+    });
+
     const adjInp = document.createElement('input');
     adjInp.type = 'number';
-    adjInp.className = 'mb-seg-adjust';
+    adjInp.className = 'mb-seg-adjust mb-advanced-only' + (mbMode === 'simple' ? ' mb-hidden' : '');
     adjInp.value = mbAdjustments[i] || 0;
     adjInp.step = 1;
-    adjInp.title = 'Autojustering i mm (beräknas från montageinställningarna)';
+    adjInp.title = 'Autojustering';
     adjInp.readOnly = true;
 
     const dirCell = document.createElement('div');
@@ -3455,8 +3476,9 @@ function mbRenderSegments() {
       ['L', 'R'].forEach(d => {
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = 'mb-dir-btn' + (dir === d ? ` active-${d}` : '');
-        btn.textContent = d === 'L' ? '◄ Vänster' : 'Höger ►';
+        btn.className = 'mb-dir-btn dir-arrow' + (dir === d ? ` active-${d}` : '');
+        btn.textContent = d === 'L' ? '←' : '→';
+        btn.title = d === 'L' ? 'Vänster' : 'Höger';
         btn.addEventListener('click', () => {
           mbDirs[i] = d;
           mbRenderSegments();
@@ -3464,7 +3486,7 @@ function mbRenderSegments() {
         dirCell.appendChild(btn);
       });
     } else {
-      dirCell.className = 'mb-no-bend';
+      dirCell.className = 'mb-no-bend mb-advanced-only' + (mbMode === 'simple' ? ' mb-hidden' : '');
       dirCell.textContent = '— ingen böj';
     }
 
@@ -3479,7 +3501,6 @@ function mbRenderSegments() {
       else if (mbDirs.length >= mbSegments.length) mbDirs.pop();
       mbRecomputeAdjustments();
       mbRenderSegments();
-      mbUpdateCompNote();
     });
 
     row.append(label, inp, adjInp, dirCell, del);
