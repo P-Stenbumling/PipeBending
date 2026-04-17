@@ -808,6 +808,19 @@
     .mb-end-grid { grid-template-columns: 1fr; }
   }
   .mb-seg-meta { display: block; font-size: 0.62rem; color: var(--text-dim); }
+  .mb-seg-preview {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 2px;
+    padding: 0 2px 4px;
+    font-size: 0.62rem;
+    color: var(--text-dim);
+  }
+  .mb-seg-preview-line-main { color: var(--text); }
+  .mb-seg-preview-line-adjust { color: var(--text-dim); }
+  .mb-seg-preview-line-bd { color: var(--accent2); }
   @media (max-width: 760px) {
     .mb-seg-header {
       grid-template-columns: 74px minmax(86px, 1fr) 78px minmax(100px, 1fr) minmax(60px, 1fr) 26px;
@@ -2032,7 +2045,7 @@
               <th>#</th>
               <th id="mb-pos-header">Märkets position</th>
               <th>Sträcka (effektiv)</th>
-              <th>Böjavdrag</th>
+              <th>Böjavdrag (mellan böjar)</th>
               <th>Riktning</th>
             </tr>
           </thead>
@@ -3162,6 +3175,45 @@ function mbGetFixtureConfig() {
   return { useClamp, build };
 }
 
+function mbGetAdjustmentReason(i, useClamp, isCC) {
+  const last = mbSegments.length - 1;
+  if (i === 0) {
+    const parts = [];
+    if (useClamp) parts.push('väggfäste');
+    if (mbStartAddsLa && mbLaStart) parts.push('koppling');
+    return parts.join(' + ') || 'justering';
+  }
+  if (i === last) {
+    if (isCC) return 'CC koppling';
+    const parts = [];
+    if (useClamp) parts.push('väggfäste');
+    if (mbLaSlut) parts.push('koppling');
+    return parts.join(' + ') || 'justering';
+  }
+  if (useClamp) return 'väggfäste';
+  return 'justering';
+}
+
+function mbBuildSegmentInfoLines(i, baseVal, effectiveVal, adjustmentVal, bdVal, useClamp, isCC) {
+  const last = mbSegments.length - 1;
+  const base = Math.round(baseVal);
+  const effective = Math.round(effectiveVal);
+  const adjustment = Math.round(adjustmentVal);
+  const bd = Math.round(bdVal);
+  const reason = mbGetAdjustmentReason(i, useClamp, isCC);
+
+  let html = `<span class="mb-seg-meta mb-seg-preview-line-main">${base} mm → ${effective} mm</span>`;
+  if (adjustment !== 0) {
+    const absAdj = Math.abs(adjustment);
+    const sign = adjustment > 0 ? '+' : '−';
+    html += `<span class="mb-seg-meta mb-seg-preview-line-adjust">Justering: ${sign}${absAdj} mm (${reason})</span>`;
+  }
+  if (i > 0 && i < last) {
+    html += `<span class="mb-seg-meta mb-seg-preview-line-bd">Böjavdrag: −${bd} mm</span>`;
+  }
+  return html;
+}
+
 function mbRecomputeAdjustments() {
   mbSyncAdjustmentsLength();
   const { useClamp, build } = mbGetFixtureConfig();
@@ -3420,6 +3472,10 @@ function mbRecalc() {
 // ── Segment list rendering ─────────────────────────────────────────────────
 function mbRenderSegments() {
   mbSyncAdjustmentsLength();
+  const { useClamp } = mbGetFixtureConfig();
+  const isCC = !!document.getElementById('mb-slut-cc')?.checked;
+  const effectiveSegments = mbGetEffectiveSegments();
+  const bd = mbGetBendDeduction();
   const list = document.getElementById('mb-seg-list');
   list.innerHTML = '';
   mbSegments.forEach((len, i) => {
@@ -3539,7 +3595,19 @@ function mbRenderSegments() {
       mbRenderSegments();
     });
 
-    row.append(label, inp, adjInp, fittingCell, dirCell, del);
+    const info = document.createElement('div');
+    info.className = 'mb-seg-preview';
+    info.innerHTML = mbBuildSegmentInfoLines(
+      i,
+      mbSegments[i],
+      effectiveSegments[i],
+      mbAdjustments[i] || 0,
+      bd,
+      useClamp,
+      isCC
+    );
+
+    row.append(label, inp, adjInp, fittingCell, dirCell, del, info);
     list.appendChild(row);
   });
 }
@@ -3593,6 +3661,8 @@ function mbComputeMarks(segs, bd) {
 
 function mbCalculate() {
   const bd      = mbGetBendDeduction();
+  const { useClamp } = mbGetFixtureConfig();
+  const isCC = !!document.getElementById('mb-slut-cc')?.checked;
   mbRecomputeAdjustments();
   const effectiveSegments = mbGetEffectiveSegments();
   const nBends  = effectiveSegments.length - 1;
@@ -3757,10 +3827,20 @@ function mbCalculate() {
          <span class="mb-mark-global">(global ${Math.round(marks[i])} mm)</span>${practicalBlock}`
       : `<span class="mb-mark-pos">${Math.round(marks[i])} mm</span>${practicalBlock}`;
 
+    const segmentInfo = mbBuildSegmentInfoLines(
+      i,
+      mbSegments[i],
+      effectiveSegments[i],
+      mbAdjustments[i] || 0,
+      bd,
+      useClamp,
+      isCC
+    );
+
     rows += `<tr class="${onP2 ? 'mb-row-p2' : ''}">
       <td>${pjasTag} ${i + 1}</td>
       <td>${posCell}</td>
-      <td><span class="mb-raw-len">${Math.round(effectiveSegments[i])} mm</span>${mbAdjustments[i] !== 0 ? `<span class="mb-seg-meta">${Math.round(mbSegments[i])} → ${Math.round(effectiveSegments[i])} mm</span>` : ''}</td>
+      <td><span class="mb-raw-len">${Math.round(effectiveSegments[i])} mm</span>${segmentInfo}</td>
       <td>${deductStr}</td>
       <td>${dirLabel}</td>
     </tr>`;
