@@ -5853,6 +5853,7 @@ function sbStreckCalc() {
   if (!D_target || D_target < 5) {
     resEl.innerHTML = '<div class="streck-hint">Ange önskad förflyttning i sidmått-fältet ovan.</div>';
     resEl.classList.add('visible');
+    document.getElementById('sbend-results').style.display = 'block';
     return;
   }
 
@@ -5876,6 +5877,7 @@ function sbStreckCalc() {
   if (candidates.length === 0) {
     resEl.innerHTML = `<div class="streck-fail">Offset ${D_target} mm kan inte uppnås med Fromax-streck.<br><strong>Växla till Avancerat läge</strong> för exakt beräkning.</div>`;
     resEl.classList.add('visible');
+    document.getElementById('sbend-results').style.display = 'block';
     return;
   }
 
@@ -5904,6 +5906,7 @@ function sbStreckCalc() {
 
   resEl.innerHTML = html;
   resEl.classList.add('visible');
+  document.getElementById('sbend-results').style.display = 'block';
 }
 
 function sbSetPipeSize(size) {
