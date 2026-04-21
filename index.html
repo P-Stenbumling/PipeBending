@@ -2329,6 +2329,7 @@
       <div class="action-required-header" id="sb-action-header"></div>
       <div class="sb-success" id="sb-success"></div>
       <div class="sb-warning" id="sb-warning"></div>
+      <div id="sb-tight-warn" class="hint-warn"></div>
       <button type="button" id="sb-autofix" class="sb-autofix-btn" onclick="sbAutoFix()">Justera automatiskt</button>
 
       <div class="sb-result-hero">
@@ -2991,6 +2992,9 @@ let estimatedUseCount = 0;
 // ── M1 Practical Constraint Layer ────────────────────────────────────────────
 const M1_MIN  = 40; // recommended minimum free pipe before bend mark (mm) — Fromax clamping
 const M1_WARN = 30; // warning threshold below which accuracy is compromised
+
+// ── S-böj Practical Constraint ───────────────────────────────────────────────
+const SB_CLAMP_MIN = 40; // min free pipe for Fromax clamp — applies to M1 and L (Fig 2 second bend)
 
 let bananaHMode = false; // H-styckeläge: locks M1 = M1_MIN regardless of calculation
 let bananaM1ManualOverride = false; // manual M1 keeps bend geometry and applies positional offset
@@ -5745,7 +5749,9 @@ function sbUpdateSimpleCard(summary) {
   document.getElementById('sbsc-m2').textContent = Math.round(summary.M2);
   const note = document.getElementById('sbsc-note');
   if (note) {
-    if (Math.round(summary.A) === 45) {
+    if (summary.tightFeasible === false) {
+      note.textContent = `Tight bock fungerar inte vid ${Math.round(summary.A)}°. Böj M1, vänd röret, böj M2 med ${Math.round(summary.L)} mm mellanrum.`;
+    } else if (Math.round(summary.A) === 45) {
       note.textContent = 'Snabbregel: 45° -> L ≈ 1.41 x D (räcker i fält).';
     } else if (Math.round(summary.A) === 30) {
       note.textContent = 'Snabbregel: 30° -> L ≈ 2 x D (räcker i fält).';
@@ -6093,6 +6099,20 @@ function sbCalculate() {
     ? `<span id="sb-mismatch-badge" class="result-badge result-badge-warn visible">⚠ Fel böjradie — offseten blir fel och kopplingarna kan spännas. Ange faktisk CLR.</span>`
     : `<span id="sb-mismatch-badge" class="result-badge result-badge-warn"></span>`;
 
+  // 4e. Tight S-böj feasibility — practical clamp check
+  // minLForBend = L_tight = 2*CLR*tan(A/2): smallest possible L (bend zones meet)
+  // If L_tight < SB_CLAMP_MIN the clamp cannot grip for the second bend → tight is not physically feasible
+  const tightFeasible = minLForBend >= SB_CLAMP_MIN;
+  const tightWarnEl = document.getElementById('sb-tight-warn');
+  if (tightWarnEl) {
+    if (!tightFeasible) {
+      tightWarnEl.textContent = `⚠ Tight bock ej genomförbar vid ${A}° — klonen har bara ${Math.round(minLForBend)} mm att gripa (behöver ${SB_CLAMP_MIN} mm). Standardmetod: böj M1, vänd röret, böj M2 med ${Math.round(L)} mm mellanrum.`;
+      tightWarnEl.classList.add('visible');
+    } else {
+      tightWarnEl.classList.remove('visible');
+    }
+  }
+
   // Stage 5: render results
   document.getElementById('sbend-results').style.display = 'block';
 
@@ -6100,7 +6120,7 @@ function sbCalculate() {
   document.getElementById('sb-cut').textContent   = Math.round(cut);
   document.getElementById('sb-d-out').textContent = Math.round(D);
   document.getElementById('sb-L-out').textContent = Math.round(L);
-  sbLastSummary = { cut, M1, M2, A, D };
+  sbLastSummary = { cut, M1, M2, A, D, L, tightFeasible };
   sbUpdateSimpleCard(sbLastSummary);
 
   // Reference strip — RULE: reference must exist in result zone
