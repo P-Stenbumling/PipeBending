@@ -5803,18 +5803,22 @@ function sbUpdateSimpleCard(summary) {
   card.classList.add('visible');
 }
 
-// ── Fromax Streck Table (empirical) ──────────────────────────────────────────
-// Maps number of marks on Fromax No.55 bender arm to offset range and angle equiv.
+// ── Fromax Streck Table (hybrid: empirical labels, geometric angles) ──────────
+// A (degrees) maps each mark position on Fromax No.55 arm to an internal angle.
+// Angles are used only internally — never shown in UI.
+// Same angle mapping for 12mm and 15mm (marks are physical, CLR changes per size).
 const FROMAX_STRECK = {
   12: [
-    { streck: 1, offset_mid: 15, offset_min: 12, offset_max: 18, offset_label: '~15',    angle_equiv: 35 },
-    { streck: 2, offset_mid: 30, offset_min: 25, offset_max: 35, offset_label: '~30',    angle_equiv: 50 },
-    { streck: 3, offset_mid: 47, offset_min: 43, offset_max: 53, offset_label: '~45–50', angle_equiv: 62 },
+    { streck: 1,   streck_label: '1 streck',              A: 22.5 },
+    { streck: 2,   streck_label: '2 streck',              A: 32   },
+    { streck: 2.5, streck_label: 'halvvägs mellan 2 och 3', A: 40 },
+    { streck: 3,   streck_label: '3 streck',              A: 45   },
   ],
   15: [
-    { streck: 1, offset_mid: 20, offset_min: 17, offset_max: 24, offset_label: '~20',    angle_equiv: 35 },
-    { streck: 2, offset_mid: 40, offset_min: 35, offset_max: 46, offset_label: '~40',    angle_equiv: 50 },
-    { streck: 3, offset_mid: 60, offset_min: 54, offset_max: 67, offset_label: '~60',    angle_equiv: 62 },
+    { streck: 1,   streck_label: '1 streck',              A: 22.5 },
+    { streck: 2,   streck_label: '2 streck',              A: 32   },
+    { streck: 2.5, streck_label: 'halvvägs mellan 2 och 3', A: 40 },
+    { streck: 3,   streck_label: '3 streck',              A: 45   },
   ]
 };
 
@@ -5852,44 +5856,49 @@ function sbStreckCalc() {
     return;
   }
 
-  const table     = FROMAX_STRECK[size] || FROMAX_STRECK[12];
-  const maxOffset = table[table.length - 1].offset_max;
+  const table = FROMAX_STRECK[size] || FROMAX_STRECK[12];
+  const clr   = FROMAX_CLR[size] || 43;
 
-  if (D_target > maxOffset + 15) {
-    resEl.innerHTML = `<div class="streck-fail">Offset ${D_target} mm är utanför strecklägets räckvidd (max ~${maxOffset} mm).<br><strong>Växla till Avancerat läge</strong> för exakt beräkning.</div>`;
+  // For each streck: compute L = D/sin(A), check geometry and physics
+  const IDEAL_L = 80; // target L — balances pipe use and workability
+  const candidates = table.map(entry => {
+    const rad          = entry.A * Math.PI / 180;
+    const L            = D_target / Math.sin(rad);
+    const L_tight_geom = 2 * clr * Math.tan(rad / 2);
+    const geometryOk   = L >= L_tight_geom; // D >= D_min for this angle
+    const proc         = geometryOk
+      ? frValidate({ A: entry.A, clr, D: D_target, M1in: MIN_GRIP, L, rBin: MIN_GRIP })
+      : null;
+    const inIdeal      = L >= 50 && L <= 120;
+    return { ...entry, L, geometryOk, proc, inIdeal };
+  }).filter(c => c.geometryOk);
+
+  if (candidates.length === 0) {
+    resEl.innerHTML = `<div class="streck-fail">Offset ${D_target} mm kan inte uppnås med Fromax-streck.<br><strong>Växla till Avancerat läge</strong> för exakt beräkning.</div>`;
     resEl.classList.add('visible');
     return;
   }
 
-  // Nearest streck
-  let best = table[0];
-  let bestDiff = Infinity;
-  for (const entry of table) {
-    const diff = Math.abs(D_target - entry.offset_mid);
-    if (diff < bestDiff) { bestDiff = diff; best = entry; }
-  }
+  // Selection: prefer ideal L range, then closest to IDEAL_L
+  candidates.sort((a, b) => {
+    if (a.inIdeal !== b.inIdeal) return b.inIdeal - a.inIdeal; // ideal first
+    return Math.abs(a.L - IDEAL_L) - Math.abs(b.L - IDEAL_L); // then closest to 80mm
+  });
+  const best = candidates[0];
 
-  const clr = FROMAX_CLR[size] || 43;
-  const A   = best.angle_equiv;
-  const rad = A * Math.PI / 180;
-  const L   = D_target / Math.sin(rad);
+  // Method: tight only for 3 streck (45°) when physically feasible
+  const allowTight  = best.streck >= 3 && best.proc && best.proc.tightFeasible;
+  const methodTxt   = allowTight ? 'Tight S-böj möjlig' : 'Standard S-böj (vänd röret)';
+  const longNote    = !best.inIdeal ? ` (längre än idealt — funkar men mer rör går åt)` : '';
 
-  const proc     = frValidate({ A, clr, D: D_target, M1in: MIN_GRIP, L, rBin: MIN_GRIP });
-  const isInRange = D_target >= best.offset_min && D_target <= best.offset_max;
-  const methodTxt = proc.tightFeasible ? 'Tight S-böj möjlig' : 'Standard S-böj (vänd röret)';
-
-  let html = `<div class="streck-headline">${best.streck} streck per böj</div>`;
-  html += `<div class="streck-offset">Ger ca ${best.offset_label} mm offset</div>`;
-  if (!isInRange) {
-    html += `<div class="streck-approx">Närmsta inställning är ${best.streck} streck (${best.offset_label} mm) — ditt mått ${D_target} mm interpoleras.</div>`;
-  }
+  let html = `<div class="streck-headline">${best.streck_label}</div>`;
+  html += `<div class="streck-offset">Avstånd mellan böjar: <strong>${Math.round(best.L)} mm</strong>${longNote}</div>`;
   html += `<div class="streck-method">${methodTxt}</div>`;
-  html += `<div class="streck-L">Avstånd mellan böjar: ${Math.round(L)} mm</div>`;
-  html += `<div class="streck-instruction">Böj M1 → vänd röret → böj M2 med ${Math.round(L)} mm mellanrum</div>`;
-  if (proc.M1_cut > 0) {
-    html += `<div class="streck-cut">Addera ${proc.M1_cut} mm extra för grepp — kapa bort efter bockning</div>`;
+  html += `<div class="streck-instruction">Böj M1 → vänd röret → böj M2 med ${Math.round(best.L)} mm mellanrum</div>`;
+  if (best.proc && best.proc.M1_cut > 0) {
+    html += `<div class="streck-cut">Addera ${best.proc.M1_cut} mm extra för grepp — kapa bort efter bockning</div>`;
   }
-  if (proc.collisionRisk) {
+  if (best.proc && best.proc.collisionRisk) {
     html += `<div class="streck-collision">⚠ Risk för kollision vid denna vinkel — kontrollera i Avancerat läge</div>`;
   }
 
